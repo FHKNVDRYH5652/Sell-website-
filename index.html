@@ -53,15 +53,12 @@
     .tiny{font-size:12px;color:var(--muted)}
     /* floating admin button */
     .float-admin{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 30px rgba(39,116,255,.18);cursor:pointer;z-index:60;display:none}
-.card.lock .thumb img {
-  filter: blur(6px);
-  transition: filter 0.3s ease;
-}
-.card.lock:hover .thumb img {
-  filter: blur(5px);
-}
+  
+.card.lock .thumb img { filter: blur(6px); transition: filter .3s ease; }
+.card.lock:hover .thumb img { filter: blur(5px); }
+#buyThumb.blur { filter: blur(6px); }
 
-  </style>
+</style>
 </head>
 <body>
   <header>
@@ -188,7 +185,7 @@ const DEFAULT_DATA = {
   posters: ["poster.mp4","poster1.mp4","poster2.mp4","poster3.mp4","poster4.mp4"],
   categories: [
     { key:"hack_charts",    title:"Hack charts",    thumb:"hack.png",   items:[
-      {file:"hack2.png", price:200},{file:"hack3.png", price:99},{file:"hack4.png", price:99},{file:"hack5.png", price:99},{file:"hack6.png", price:99}
+      {file:"hack2.png", title:"Hack chart", price:99},{file:"hack3.png", title:"Hack chart 2", price:99},{file:"hack4.png", title:"Hack chart 3", price:99},{file:"hack5.png", title:"Hack chart 4", price:99},{file:"hack6.png", title:"Hack chart 5", price:99}
     ]},
     { key:"hack_apk",       title:"Hack apk",       thumb:"app.png",    items:[
       {file:"app1.apk", price:199},{file:"app2.apk", price:199},{file:"app3.apk", price:199},{file:"app4.apk", price:199},{file:"app5.apk", price:199}
@@ -203,12 +200,8 @@ const DEFAULT_DATA = {
   orders:{} // map "catKey|index" -> {paid:true}
 };
 
-function loadStore(){
-  const raw = localStorage.getItem("store.v1");
-  if(!raw){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
-  try{ return JSON.parse(raw); }catch(e){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
-}
-function saveStore(data){ localStorage.setItem("store.v1", JSON.stringify(data)); }
+function loadStore(){ return structuredClone(DEFAULT_DATA); }
+function saveStore(data){}
 let STORE = loadStore();
 
 // ------- Poster Carousel -------
@@ -262,7 +255,7 @@ function renderCatalog(){
       card.innerHTML = `
         <div class="thumb"><img alt="${it.file}" src="${thumbFor(it.file)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(it.file))}'"></div>
         <div class="content">
-          <div class="title">${it.file}</div>
+          <div class="title">${it.title || it.file}</div>
           <div class="row">
             <span class="price">₹${it.price || 0}</span>
             ${paid ? `<span class="pill">Unlocked</span>` : `<span class="pill">Locked</span>`}
@@ -357,7 +350,8 @@ function openBuy(ci,ii){
   // fill modal
   document.getElementById("buyTitle").textContent = `Pay & Get Item`;
   document.getElementById("buyThumb").src = thumbFor(it.file);
-  document.getElementById("buyName").textContent = it.file;
+  document.getElementById("buyThumb").classList.add("blur");
+  document.getElementById("buyName").textContent = it.title || it.file;
   document.getElementById("buyPrice").textContent = `Price: ₹${it.price || 0}`;
   document.getElementById("amount").textContent = `₹${it.price || 0}`;
 
@@ -432,6 +426,7 @@ function openBuy(ci,ii){
     renderCatalog();
     showSuccessPopup();
     document.getElementById("buyModal").style.display = 'none';
+    try{ document.getElementById('buyThumb').classList.remove('blur'); }catch(e){}
   };
 
   document.getElementById("buyModal").style.display = 'flex';
@@ -439,7 +434,7 @@ function openBuy(ci,ii){
 function preview(ci,ii){
   ci=+ci; ii=+ii;
   const cat = STORE.categories[ci], it = cat.items[ii];
-  alert(`Preview: ${it.file}\n(Provide a real preview file/URL for better UX)`);
+  alert(`Preview: ${it.title || it.file}\n(Provide a real preview file/URL for better UX)`);
 }
 
 // ------- Admin (PIN 2468). Only filename & price editable -------
@@ -465,6 +460,7 @@ document.getElementById("pinGo").onclick=()=>{
       const row = document.createElement("div"); row.className="field";
       row.innerHTML = `
         <label>Item ${ii+1}</label>
+        <input data-ci="${ci}" data-ii="${ii}" data-k="title" value="${it.title || it.file}" placeholder="Item title (shown to users)" />
         <input data-ci="${ci}" data-ii="${ii}" data-k="file" value="${it.file}" />
         <input data-ci="${ci}" data-ii="${ii}" data-k="price" type="number" min="0" value="${it.price||0}" />
       `;
@@ -495,10 +491,29 @@ window.addEventListener("scroll", checkScroll);
 window.addEventListener("resize", checkScroll);
 checkScroll();
 
+// ------- Firebase Realtime Binding -------
+(function(){
+  const applyRender = (data)=>{ STORE = data || DEFAULT_DATA; renderCatalog(); };
+  if (window.__ref) {
+    const storeRef = window.__ref('storeData');
+    window.__onValue(storeRef, (snap)=>{
+      const val = snap.val();
+      if(val){ STORE = val; }
+      else { STORE = DEFAULT_DATA; window.__set(storeRef, DEFAULT_DATA); }
+      renderCatalog();
+    });
+    window.saveStore = (data)=>window.__update(storeRef, data);
+  } else {
+    console.warn('Firebase not available — using local default data.');
+    applyRender(DEFAULT_DATA);
+    window.saveStore = (data)=>{ try{ localStorage.setItem('store.v1', JSON.stringify(data)); }catch(e){} };
+  }
+})();
+
 // ------- Init -------
-buildCarousel();
-renderCatalog();
-document.getElementById("year").textContent = new Date().getFullYear();
+try{ buildCarousel(); }catch(e){}
+try{ if(typeof renderCatalog==='function') renderCatalog(); }catch(e){}
+try{ document.getElementById("year").textContent = new Date().getFullYear(); }catch(e){}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
@@ -513,5 +528,33 @@ function showSuccessPopup(){
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBs7eQyMrcN8kJWMHl2ac2UZHlYQ6DypD8",
+    authDomain: "terminal-xxrr.firebaseapp.com",
+    databaseURL: "https://terminal-xxrr-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "terminal-xxrr",
+    storageBucket: "terminal-xxrr.firebasestorage.app",
+    messagingSenderId: "722753278120",
+    appId: "1:722753278120:web:bfa37aab39635a4e57f29d",
+    measurementId: "G-E3MZH3E1K5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Expose helpers to window for non-module scripts
+  window.__db = db;
+  window.__ref = (path)=>ref(db, path);
+  window.__onValue = onValue;
+  window.__set = set;
+  window.__update = update;
+  window.__get = get;
+</script>
+
 </body>
 </html>
