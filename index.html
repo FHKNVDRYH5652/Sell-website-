@@ -53,6 +53,14 @@
     .tiny{font-size:12px;color:var(--muted)}
     /* floating admin button */
     .float-admin{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 30px rgba(39,116,255,.18);cursor:pointer;z-index:60;display:none}
+.card.lock .thumb img {
+  filter: blur(6px);
+  transition: filter 0.3s ease;
+}
+.card.lock:hover .thumb img {
+  filter: blur(5px);
+}
+
   </style>
 </head>
 <body>
