@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Digital Store — Simple Buy & Download</title>
+  <style>
+    :root{
+      --bg:#ffffff; --card:#f7f8fb; --text:#0b1724; --muted:#5b6b7a; --accent:#2774ff; --ok:#26d07c; --warn:#ffb020; --danger:#ff6b6b;
+      --shadow:0 6px 20px rgba(9,30,66,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
+    a{color:var(--accent);text-decoration:none}
+    .container{max-width:1100px;margin:auto;padding:16px}
+    header{position:sticky;top:0;background:rgba(255,255,255,0.9);backdrop-filter:blur(6px);z-index:10;border-bottom:1px solid #e6ebf2}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .btn{padding:8px 12px;border:1px solid #e3eaf6;background:#fff;color:var(--text);border-radius:10px;cursor:pointer;box-shadow:var(--shadow);transition:.15s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(9,30,66,.08)}
+    .btn.primary{background:linear-gradient(135deg,#2774ff,#6aa9ff);border-color:#2d6cff;color:#fff}
+    .btn.success{background:linear-gradient(135deg,#18a86b,#26d07c);border-color:#19a567;color:#fff}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid #e6eef8;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+    .thumb{height:150px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e6eef8}
+    .thumb img,.thumb video{max-width:100%;max-height:100%}
+    .content{padding:12px}
+    .title{font-size:16px;font-weight:700;margin:0 0 6px}
+    .sub{font-size:13px;color:var(--muted)}
+    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
+    .price{font-weight:800}
+    .pill{font-size:12px;padding:4px 8px;background:#fff;border:1px solid #e3eaf6;border-radius:999px;color:#5b6b7a}
+    .section{margin:24px 0}
+    .section h2{margin:0 0 8px;font-size:22px;color:var(--text)}
+    .carousel{position:relative;border-radius:12px;overflow:hidden;border:1px solid #e6eef8;background:#fff}
+    .carousel video{width:100%;height:300px;object-fit:cover}
+    .car-ctrl{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;width:100%}
+    .car-ctrl button{background:rgba(255,255,255,.9);border:1px solid #e6eef8;border-radius:999px;width:44px;height:44px;margin:0 8px;color:var(--text);font-size:18px;cursor:pointer}
+    .dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:6px;justify-content:center}
+    .dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;border:1px solid #f0f5fb}
+    .dot.active{background:var(--accent)}
+    footer{opacity:.9;padding:24px 0;text-align:center}
+    .lock{opacity:.85}
+    /* modal */
+    .modal{position:fixed;inset:0;background:rgba(9,30,66,.06);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal .box{background:var(--card);border:1px solid #e6eef8;border-radius:12px;box-shadow:var(--shadow);width:min(540px,92%);padding:16px}
+    .box h3{margin:0 0 8px;color:var(--text)}
+    .field{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+    .field input{padding:10px 12px;border-radius:8px;border:1px solid #e6eef8;background:#fff;color:var(--text)}
+    .admin-panel{margin-top:12px;padding:12px;border:1px dashed #e6eef8;border-radius:12px}
+    details{background:#fff;border:1px solid #e6eef8;border-radius:12px;padding:10px}
+    summary{cursor:pointer;font-weight:700}
+    .tiny{font-size:12px;color:var(--muted)}
+    /* floating admin button */
+    .float-admin{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 30px rgba(39,116,255,.18);cursor:pointer;z-index:60;display:none}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav container">
+      <div class="brand">Digital Store</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <!-- Top buttons removed as requested -->
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Poster Carousel -->
+    <section class="section">
+      <h2>Posters</h2>
+      <div class="carousel" id="carousel">
+        <!-- videos injected by JS -->
+        <div class="car-ctrl">
+          <button id="prevBtn">&#10094;</button>
+          <button id="nextBtn">&#10095;</button>
+        </div>
+        <div class="dots" id="dots"></div>
+      </div>
+      <div class="tiny">Videos will autoplay (muted). Filenames expected: poster.mp4, poster1.mp4, poster2.mp4, poster3.mp4, poster4.mp4.</div>
+    </section>
+
+    <!-- Categories -->
+    <section class="section">
+      <h2>Categories</h2>
+      <div id="catalog" class="grid"></div>
+    </section>
+  </main>
+
+  <!-- Buy / Verify Modal -->
+<!-- Buy / Payment Modal -->
+  <div class="modal" id="buyModal">
+    <div class="box">
+      <h3 id="buyTitle">Pay & Get Item</h3>
+      <div id="buyBody">
+        <div style="display:flex;gap:12px;align-items:center">
+          <img id="buyThumb" src="" alt="thumb" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid #e6eef8" />
+          <div>
+            <div id="buyName" style="font-weight:800"></div>
+            <div id="buyPrice" class="tiny" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label class="tiny">Upload Payment Screenshot</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="file" id="screenshotFile" accept="image/*" />
+            <div id="screenshotName" class="tiny muted">No file chosen</div>
+          </div>
+          <div class="tiny" style="margin-top:6px">Upload screenshot to auto-verify</div>
+        </div>
+
+        <div style="margin-top:14px;border:1px solid #e6eef8;border-radius:8px;padding:12px;background:#fff">
+          <div style="font-weight:700;margin-bottom:6px">Scan & Pay</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:120px;height:120px;border:1px solid #e6eef8;display:flex;align-items:center;justify-content:center;background:#fafbfd">
+              <div id="qrBox" style="width:100px;height:100px;display:flex;align-items:center;justify-content:center;"></div>
+            </div>
+            <div style="flex:1">
+              <div class="tiny muted">UPI ID: <strong id="upiId">your-upi@bank</strong></div>
+              <div class="tiny muted" style="margin-top:6px">Note: <span id="note">ORDER-XXXXX</span></div>
+              <div style="margin-top:10px"><strong>Amount: <span id="amount">₹0</span></strong></div>
+              <div style="margin-top:8px"><button class="btn" id="copyUpi">Copy UPI</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label class="tiny">UTR / Transaction ID</label>
+          <input id="utrInput" placeholder="Enter UTR after payment" />
+        </div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <div id="screenshotStatus" class="tiny muted">Waiting for screenshot...</div>
+          <div style="flex:1"></div>
+          <button class="btn primary" id="verifyBtn">Verify</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="closeBuy">Close</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Admin Modal -->
+  <div class="modal" id="adminModal">
+    <div class="box">
+      <h3>Admin</h3>
+      <div id="adminBody">
+        <div class="field"><input type="password" id="pin" placeholder="Enter PIN (default 2468)" /></div>
+        <button class="btn primary" id="pinGo">Open</button>
+      </div>
+      <div class="row"><button class="btn" id="closeAdmin">Close</button></div>
+    </div>
+  </div>
+
+  <!-- Floating admin button (shows only when scrolled to bottom) -->
+  <div class="float-admin" id="floatAdmin" title="Admin panel (PIN required)">⚙</div>
+
+  <div id="successPopup" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(9,30,66,.15);backdrop-filter:blur(2px);z-index:80">
+  <div style="width:min(420px,92%);background:#fff;border:1px solid #e6eef8;border-radius:16px;box-shadow:0 14px 40px rgba(9,30,66,.18);padding:20px;text-align:center">
+    <div style="display:inline-flex;width:72px;height:72px;border-radius:50%;background:#eafaf1;align-items:center;justify-content:center;border:2px solid #b7f0cb;animation:popin .25s ease-out">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#26a269" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+    <div style="font-weight:800;font-size:18px;margin-top:10px;color:#0b1724">Payment Verified Successfully — Item Unlocked!</div>
+    <div style="margin-top:6px;color:#5b6b7a;font-size:13px">You can now download your item.</div>
+  </div>
+</div>
+<style>
+@keyframes popin { from{ transform:scale(.8); opacity:.0 } to{ transform:scale(1); opacity:1 } }
+</style>
+<footer><div class="container">© <span id="year"></span> Digital Store. Demo only.</div></footer>
+
+<script>
+// ------- Data Model (localStorage) --------
+const DEFAULT_DATA = {
+  posters: ["poster.mp4","poster1.mp4","poster2.mp4","poster3.mp4","poster4.mp4"],
+  categories: [
+    { key:"hack_charts",    title:"Hack charts",    thumb:"hack.png",   items:[
+      {file:"hack2.png", price:99},{file:"hack3.png", price:99},{file:"hack4.png", price:99},{file:"hack5.png", price:99},{file:"hack6.png", price:99}
+    ]},
+    { key:"hack_apk",       title:"Hack apk",       thumb:"app.png",    items:[
+      {file:"app1.apk", price:199},{file:"app2.apk", price:199},{file:"app3.apk", price:199},{file:"app4.apk", price:199},{file:"app5.apk", price:199}
+    ]},
+    { key:"suresort",       title:"SURESORT prediction", thumb:"suresort.png", items:[
+      {file:"prediction.html", price:0, note:"Opens a separate page"}
+    ]},
+    { key:"under3",         title:"Under 3 level Trick", thumb:"thumb.png", items:[
+      {file:"thumb1.mp4", price:149},{file:"thumb2.mp4", price:149},{file:"thumb3.mp4", price:149},{file:"thumb4.mp4", price:149},{file:"thumb5.mp4", price:149}
+    ]}
+  ],
+  orders:{} // map "catKey|index" -> {paid:true}
+};
+
+function loadStore(){
+  const raw = localStorage.getItem("store.v1");
+  if(!raw){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
+  try{ return JSON.parse(raw); }catch(e){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
+}
+function saveStore(data){ localStorage.setItem("store.v1", JSON.stringify(data)); }
+let STORE = loadStore();
+
+// ------- Poster Carousel -------
+const car = document.getElementById("carousel");
+const dots = document.getElementById("dots");
+let carIndex = 0;
+let carVideos = [];
+function buildCarousel(){
+  car.innerHTML = ""; dots.innerHTML = "";
+  carVideos = STORE.posters.map((src,i)=>{
+    const v = document.createElement("video");
+    v.src = src; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true; v.setAttribute("preload","metadata");
+    if(i!==0) v.style.display="none";
+    car.appendChild(v);
+    const d=document.createElement("div"); d.className="dot"+(i===0?" active":""); d.dataset.i=i; dots.appendChild(d);
+    d.onclick=()=>showSlide(i);
+    return v;
+  });
+}
+function showSlide(i){
+  if(!carVideos.length) return;
+  carVideos[carIndex].style.display="none"; dots.children[carIndex].classList.remove("active");
+  carIndex = (i+carVideos.length)%carVideos.length;
+  carVideos[carIndex].style.display="block"; dots.children[carIndex].classList.add("active");
+  carVideos[carIndex].play().catch(()=>{});
+}
+document.getElementById("prevBtn").onclick=()=>showSlide(carIndex-1);
+document.getElementById("nextBtn").onclick=()=>showSlide(carIndex+1);
+let autoTimer=setInterval(()=>showSlide(carIndex+1), 8000);
+
+// ------- Catalog Render -------
+const catalog = document.getElementById("catalog");
+function renderCatalog(){
+  catalog.innerHTML = "";
+  STORE.categories.forEach((cat,ci)=>{
+    // category card header
+    const wrap = document.createElement("div"); wrap.className="card";
+    wrap.innerHTML = `
+      <div class="thumb"><img alt="${cat.title}" src="${cat.thumb}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(cat.title))}'"></div>
+      <div class="content">
+        <div class="title">${cat.title}</div>
+        <div class="sub">Items: ${cat.items.length}</div>
+      </div>`;
+    catalog.appendChild(wrap);
+
+    // items grid per category
+    cat.items.forEach((it,ii)=>{
+      const key = `${cat.key}|${ii}`;
+      const paid = !!STORE.orders[key]?.paid || it.price===0;
+      const card = document.createElement("div"); card.className="card"+(paid?"":" lock");
+      card.innerHTML = `
+        <div class="thumb"><img alt="${it.file}" src="${thumbFor(it.file)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(it.file))}'"></div>
+        <div class="content">
+          <div class="title">${it.file}</div>
+          <div class="row">
+            <span class="price">₹${it.price || 0}</span>
+            ${paid ? `<span class="pill">Unlocked</span>` : `<span class="pill">Locked</span>`}
+          </div>
+          <div class="row">
+            ${cat.key==="suresort" ? `<a class="btn primary" href="prediction.html">Open</a>`
+              : paid ? `<a class="btn success" href="${it.file}" download>Download</a>`
+                     : `<button class="btn primary" data-act="buy" data-ci="${ci}" data-ii="${ii}">Buy</button>`}
+            <button class="btn" data-act="preview" data-ci="${ci}" data-ii="${ii}">Preview</button>
+          </div>
+        </div>`;
+      catalog.appendChild(card);
+    });
+  });
+
+  // attach listeners
+  catalog.querySelectorAll("button[data-act='buy']").forEach(btn=>btn.onclick=()=>openBuy(btn.dataset.ci, btn.dataset.ii));
+  catalog.querySelectorAll("button[data-act='preview']").forEach(btn=>btn.onclick=()=>preview(btn.dataset.ci, btn.dataset.ii));
+}
+function thumbFor(file){
+  const lower = file.toLowerCase();
+  if(lower.endsWith(".png")||lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".gif")) return file;
+  if(lower.endsWith(".mp4")||lower.endsWith(".webm")||lower.endsWith(".mov")) return "thumb.png";
+  if(lower.endsWith(".apk")) return "app.png";
+  return "suresort.png";
+}
+function svgPlaceholder(text){
+  const bg = "%23ffffff", fg = "%232774ff";
+  return `<svg xmlns='http://www.w3.org/2000/svg' width='480' height='300'><rect width='100%' height='100%' fill='${bg}'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='${fg}' font-family='Arial' font-size='20'>${text}</text></svg>`;
+}
+
+
+// ---- Amount-in-words helpers ----
+const BELOW_20 = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+const TENS = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+
+function hundredToWords(n){
+  let out=[];
+  if(n>=100){ out.push(BELOW_20[Math.floor(n/100)]+" hundred"); n%=100; }
+  if(n>=20){ out.push(TENS[Math.floor(n/10)] + (n%10? " " + BELOW_20[n%10]:"")); }
+  else if(n>0){ out.push(BELOW_20[n]); }
+  if(out.length===0) return "zero";
+  return out.join(" ");
+}
+
+function numberToWords(n){
+  n = Math.round(+n||0);
+  if(n===0) return "zero";
+  const parts=[];
+  const billions = Math.floor(n/1_000_000_000); n%=1_000_000_000;
+  const millions = Math.floor(n/1_000_000); n%=1_000_000;
+  const thousands = Math.floor(n/1000); n%=1000;
+  const hundreds = n;
+  if(billions) parts.push(hundredToWords(billions)+" billion");
+  if(millions) parts.push(hundredToWords(millions)+" million");
+  if(thousands) parts.push(hundredToWords(thousands)+" thousand");
+  if(hundreds) parts.push(hundredToWords(hundreds));
+  return parts.join(" ").replace(/\s+/g," ").trim();
+}
+
+function normalizeText(t){
+  return (t||"")
+    .toLowerCase()
+    .replace(/[,₹]/g," ")
+    .replace(/\brs\.?\b/g," ")
+    .replace(/\brupees?\b/g," ")
+    .replace(/\bonly\b/g," ")
+    .replace(/[^a-z0-9\s]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function matchAmountWords(normText, priceWords){
+  if(!normText) return false;
+  const pw = priceWords.toLowerCase().replace(/\s+/g," ").trim();
+  // Try with and without 'and'
+  const withAnd = pw.replace(/ hundred (\w)/, " hundred and $1");
+  return normText.includes(pw) || normText.includes(withAnd);
+}
+
+// ------- Buy Flow (mock verify) -------
+const buyModal = document.getElementById("buyModal");
+const buyBody = document.getElementById("buyBody");
+const buyTitle= document.getElementById("buyTitle");
+document.getElementById("closeBuy").onclick=()=>buyModal.style.display="none";
+
+
+function openBuy(ci,ii){
+  ci=+ci; ii=+ii;
+  const cat = STORE.categories[ci], it = cat.items[ii];
+  const key = `${cat.key}|${ii}`;
+  // fill modal
+  document.getElementById("buyTitle").textContent = `Pay & Get Item`;
+  document.getElementById("buyThumb").src = thumbFor(it.file);
+  document.getElementById("buyName").textContent = it.file;
+  document.getElementById("buyPrice").textContent = `Price: ₹${it.price || 0}`;
+  document.getElementById("amount").textContent = `₹${it.price || 0}`;
+
+  // upi + QR
+  const upiId = "perfect.k@ptaxis";
+  document.getElementById("upiId").textContent = upiId;
+  const orderNote = `ORDER-${Date.now().toString().slice(-10)}`;
+  document.getElementById("note").textContent = orderNote;
+  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Digital Store')}&am=${encodeURIComponent(it.price||0)}&cu=INR&tn=${encodeURIComponent(orderNote)}`;
+  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=240x240&chl=${encodeURIComponent(upiUrl)}`;
+  const qrBox = document.getElementById('qrBox');
+  if(qrBox){ qrBox.innerHTML=''; new QRCode(qrBox, {text: upiUrl, width: 100, height: 100}); }
+
+  // reset fields/status
+  document.getElementById("screenshotName").textContent = 'No file chosen';
+  document.getElementById("screenshotStatus").innerHTML = '<span class="badge">Waiting for screenshot…</span>';
+  document.getElementById("utrInput").value = '';
+
+  // OCR state
+  let ocrText = '';
+  const fileInput = document.getElementById("screenshotFile");
+  fileInput.value = '';
+  fileInput.onchange = (e)=>{
+    const f = e.target.files[0];
+    if(!f) { document.getElementById("screenshotName").textContent = 'No file chosen'; return; }
+    document.getElementById("screenshotName").textContent = f.name;
+    document.getElementById("screenshotStatus").innerHTML = '<span class="badge">Reading screenshot… 0%</span>';
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try{
+        const { createWorker } = Tesseract;
+        const worker = await createWorker('eng', 1, { logger: m => {
+          if(m.status==='recognizing text' && m.progress!=null){
+            const pct = Math.round(m.progress*100);
+            document.getElementById("screenshotStatus").innerHTML = `<span class=\"badge\">Reading screenshot… ${pct}%</span>`;
+          }
+        }});
+        const ret = await worker.recognize(reader.result);
+        ocrText = (ret.data && ret.data.text ? ret.data.text : '') || '';
+        await worker.terminate();
+        const norm = normalizeText(ocrText);
+        const priceWords = numberToWords(it.price||0);
+        const matched = matchAmountWords(norm, priceWords);
+        document.getElementById("screenshotStatus").innerHTML = matched
+          ? `<span class=\"badge\" style=\"border-color:#b7f0cb;background:#eafaf1\">Amount words detected: \"${priceWords}\"</span>`
+          : `<span class=\"badge\" style=\"border-color:#ffd5d5;background:#fff7f7\">Amount words NOT detected</span>`;
+      }catch(err){
+        console.error(err);
+        document.getElementById("screenshotStatus").innerHTML = '<span class="badge" style="border-color:#ffd5d5;background:#fff7f7">OCR failed</span>';
+      }
+    };
+    reader.readAsDataURL(f);
+  };
+
+  // copy upi
+  document.getElementById("copyUpi").onclick = ()=>{
+    navigator.clipboard?.writeText(upiId).then(()=>alert('UPI copied')).catch(()=>alert('Copy failed'));
+  };
+
+  // verify must match amount words
+  document.getElementById("verifyBtn").onclick = ()=>{
+    const utr = document.getElementById("utrInput").value.trim();
+    const priceWords = numberToWords(it.price||0);
+    const ok = matchAmountWords(normalizeText(ocrText), priceWords);
+    if(!ok){
+      alert('Amount words not found in screenshot. Verification failed.');
+      return;
+    }
+    STORE.orders[key] = { paid:true, ref: utr || 'screenshot-words' };
+    saveStore(STORE);
+    renderCatalog();
+    showSuccessPopup();
+    document.getElementById("buyModal").style.display = 'none';
+  };
+
+  document.getElementById("buyModal").style.display = 'flex';
+}
+function preview(ci,ii){
+  ci=+ci; ii=+ii;
+  const cat = STORE.categories[ci], it = cat.items[ii];
+  alert(`Preview: ${it.file}\n(Provide a real preview file/URL for better UX)`);
+}
+
+// ------- Admin (PIN 2468). Only filename & price editable -------
+// Admin button is hidden and appears when user scrolls to bottom
+const adminModal = document.getElementById("adminModal");
+const floatAdmin = document.getElementById("floatAdmin");
+floatAdmin.onclick = ()=>{ adminModal.style.display="flex"; };
+document.getElementById("closeAdmin").onclick=()=>adminModal.style.display="none";
+
+document.getElementById("pinGo").onclick=()=>{
+  const ok = document.getElementById("pin").value==="2468";
+  if(!ok){ alert("Wrong PIN"); return; }
+  const body = document.getElementById("adminBody");
+  body.innerHTML = "";
+  STORE.categories.forEach((cat,ci)=>{
+    const wrap = document.createElement("div");
+    wrap.className="admin-panel";
+    const details = document.createElement("details");
+    const sum = document.createElement("summary"); sum.textContent = cat.title + ` (${cat.key})`;
+    details.appendChild(sum);
+    // table of items
+    cat.items.forEach((it,ii)=>{
+      const row = document.createElement("div"); row.className="field";
+      row.innerHTML = `
+        <label>Item ${ii+1}</label>
+        <input data-ci="${ci}" data-ii="${ii}" data-k="file" value="${it.file}" />
+        <input data-ci="${ci}" data-ii="${ii}" data-k="price" type="number" min="0" value="${it.price||0}" />
+      `;
+      details.appendChild(row);
+    });
+    // save button
+    const save = document.createElement("button"); save.className="btn success"; save.textContent="Save changes";
+    save.onclick=()=>{
+      details.querySelectorAll("input").forEach(inp=>{
+        const ci=+inp.dataset.ci, ii=+inp.dataset.ii, k=inp.dataset.k;
+        const val = k==="price" ? Math.max(0, parseInt(inp.value||"0")) : inp.value.trim();
+        STORE.categories[ci].items[ii][k]=val;
+      });
+      saveStore(STORE); renderCatalog(); alert("Saved");
+    };
+    wrap.appendChild(details);
+    wrap.appendChild(save);
+    body.appendChild(wrap);
+  });
+};
+
+// Show floating admin button only when scrolled near bottom
+function checkScroll(){
+  const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 20);
+  floatAdmin.style.display = nearBottom ? "flex" : "none";
+}
+window.addEventListener("scroll", checkScroll);
+window.addEventListener("resize", checkScroll);
+checkScroll();
+
+// ------- Init -------
+buildCarousel();
+renderCatalog();
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
+<script>
+function showSuccessPopup(){
+  const el = document.getElementById('successPopup');
+  if(!el) return;
+  el.style.display = 'flex';
+  setTimeout(()=>{ el.style.display='none'; }, 3000);
+}
+</script>
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>
