@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Digital Store — Simple Buy & Download</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Digital Store — Simple Buy &amp; Download</title>
+<style>
     :root{
       --bg:#ffffff; --card:#f7f8fb; --text:#0b1724; --muted:#5b6b7a; --accent:#2774ff; --ok:#26d07c; --warn:#ffb020; --danger:#ff6b6b;
       --shadow:0 6px 20px rgba(9,30,66,.08);
@@ -54,144 +55,132 @@
     /* floating admin button */
     .float-admin{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 30px rgba(39,116,255,.18);cursor:pointer;z-index:60;display:none}
   
-/* Poster carousel improvements */
-.carousel{position:relative;border-radius:12px;overflow:hidden;border:1px solid #e6eef8;background:#000;height:300px}
-.carousel video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease}
-.carousel video.active{opacity:1}
+.card.lock .thumb img { filter: blur(6px); transition: filter .3s ease; }
+.card.lock:hover .thumb img { filter: blur(5px); }
+#buyThumb.blur { filter: blur(6px); }
 
 </style>
 </head>
 <body>
-  <header>
-    <div class="nav container">
-      <div class="brand">Digital Store</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <!-- Top buttons removed as requested -->
-      </div>
-    </div>
-  </header>
-
-  <main class="container">
-    <!-- Poster Carousel -->
-    <section class="section">
-      <h2>Posters</h2>
-      <div class="carousel" id="carousel">
-        <!-- videos injected by JS -->
-        <div class="car-ctrl">
-          <button id="prevBtn">&#10094;</button>
-          <button id="nextBtn">&#10095;</button>
-        </div>
-        <div class="dots" id="dots"></div>
-      </div>
-    </section>
-
-    <!-- Categories -->
-    <section class="section">
-      <h2>Categories</h2>
-      <div id="catalog" class="grid"></div>
-    </section>
-  </main>
-
-  <!-- Buy / Verify Modal -->
+<header>
+<div class="nav container">
+<div class="brand">Digital Store</div>
+<div style="display:flex;gap:8px;align-items:center">
+<!-- Top buttons removed as requested -->
+</div>
+</div>
+</header>
+<main class="container">
+<!-- Poster Carousel -->
+<section class="section">
+<h2>Posters</h2>
+<div class="carousel" id="carousel">
+<!-- videos injected by JS -->
+<div class="car-ctrl">
+<button id="prevBtn">❮</button>
+<button id="nextBtn">❯</button>
+</div>
+<div class="dots" id="dots"></div>
+</div>
+<div class="tiny">Videos will autoplay (muted). Filenames expected: poster.mp4, poster1.mp4, poster2.mp4, poster3.mp4, poster4.mp4.</div>
+</section>
+<!-- Categories -->
+<section class="section">
+<h2>Categories</h2>
+<div class="grid" id="catalog"></div>
+</section>
+</main>
+<!-- Buy / Verify Modal -->
 <!-- Buy / Payment Modal -->
-  <div class="modal" id="buyModal">
-    <div class="box">
-      <h3 id="buyTitle">Pay & Get Item</h3>
-      <div id="buyBody">
-        <div style="display:flex;gap:12px;align-items:center">
-          <img id="buyThumb" src="" alt="thumb" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid #e6eef8" />
-          <div>
-            <div id="buyName" style="font-weight:800"></div>
-            <div id="buyPrice" class="tiny" style="margin-top:6px"></div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <label class="tiny">Upload Payment Screenshot</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="file" id="screenshotFile" accept="image/*" />
-            <div id="screenshotName" class="tiny muted">No file chosen</div>
-          </div>
-          <div class="tiny" style="margin-top:6px">Upload screenshot to auto-verify</div>
-        </div>
-
-        <div style="margin-top:14px;border:1px solid #e6eef8;border-radius:8px;padding:12px;background:#fff">
-          <div style="font-weight:700;margin-bottom:6px">Scan & Pay</div>
-          <div style="display:flex;gap:12px;align-items:center">
-            <div style="width:120px;height:120px;border:1px solid #e6eef8;display:flex;align-items:center;justify-content:center;background:#fafbfd">
-              <div id="qrBox" style="width:100px;height:100px;display:flex;align-items:center;justify-content:center;"></div>
-            </div>
-            <div style="flex:1">
-              <div class="tiny muted">UPI ID: <strong id="upiId">your-upi@bank</strong></div>
-              <div class="tiny muted" style="margin-top:6px">Note: <span id="note">ORDER-XXXXX</span></div>
-              <div style="margin-top:10px"><strong>Amount: <span id="amount">₹0</span></strong></div>
-              <div style="margin-top:8px"><button class="btn" id="copyUpi">Copy UPI</button></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <label class="tiny">UTR / Transaction ID</label>
-          <input id="utrInput" placeholder="Enter UTR after payment" />
-        </div>
-
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-          <div id="screenshotStatus" class="tiny muted">Waiting for screenshot...</div>
-          <div style="flex:1"></div>
-          <button class="btn primary" id="verifyBtn">Verify</button>
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <button class="btn" id="closeBuy">Close</button>
-      </div>
-    </div>
-  </div>
-
+<div class="modal" id="buyModal">
+<div class="box">
+<h3 id="buyTitle">Pay &amp; Get Item</h3>
+<div id="buyBody">
+<div style="display:flex;gap:12px;align-items:center">
+<img alt="thumb" id="buyThumb" src="" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid #e6eef8"/>
+<div>
+<div id="buyName" style="font-weight:800"></div>
+<div class="tiny" id="buyPrice" style="margin-top:6px"></div>
+</div>
+</div>
+<div style="margin-top:12px">
+<label class="tiny">Upload Payment Screenshot</label>
+<div style="display:flex;gap:8px;align-items:center">
+<input accept="image/*" id="screenshotFile" type="file"/>
+<div class="tiny muted" id="screenshotName">No file chosen</div>
+</div>
+<div class="tiny" style="margin-top:6px">Upload screenshot to auto-verify</div>
+</div>
+<div style="margin-top:14px;border:1px solid #e6eef8;border-radius:8px;padding:12px;background:#fff">
+<div style="font-weight:700;margin-bottom:6px">Scan &amp; Pay</div>
+<div style="display:flex;gap:12px;align-items:center">
+<div style="width:120px;height:120px;border:1px solid #e6eef8;display:flex;align-items:center;justify-content:center;background:#fafbfd">
+<div id="qrBox" style="width:100px;height:100px;display:flex;align-items:center;justify-content:center;"></div>
+</div>
+<div style="flex:1">
+<div class="tiny muted">UPI ID: <strong id="upiId">your-upi@bank</strong></div>
+<div class="tiny muted" style="margin-top:6px">Note: <span id="note">ORDER-XXXXX</span></div>
+<div style="margin-top:10px"><strong>Amount: <span id="amount">₹0</span></strong></div>
+<div style="margin-top:8px"><button class="btn" id="copyUpi">Copy UPI</button></div>
+</div>
+</div>
+</div>
+<div style="margin-top:12px">
+<label class="tiny">UTR / Transaction ID</label>
+<input id="utrInput" placeholder="Enter UTR after payment"/>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+<div class="tiny muted" id="screenshotStatus">Waiting for screenshot...</div>
+<div style="flex:1"></div>
+<button class="btn primary" id="verifyBtn">Verify</button>
+</div>
+</div>
+<div class="row" style="margin-top:12px">
+<button class="btn" id="closeBuy">Close</button>
+</div>
+</div>
+</div>
 <!-- Admin Modal -->
-  <div class="modal" id="adminModal">
-    <div class="box">
-      <h3>Admin</h3>
-      <div id="adminBody">
-        <div class="field"><input type="password" id="pin" placeholder="Enter PIN (default 2468)" /></div>
-        <button class="btn primary" id="pinGo">Open</button>
-      </div>
-      <div class="row"><button class="btn" id="closeAdmin">Close</button></div>
-    </div>
-  </div>
-
-  <!-- Floating admin button (shows only when scrolled to bottom) -->
-  <div class="float-admin" id="floatAdmin" title="Admin panel (PIN required)">⚙</div>
-
-  <div id="successPopup" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(9,30,66,.15);backdrop-filter:blur(2px);z-index:80">
-  <div style="width:min(420px,92%);background:#fff;border:1px solid #e6eef8;border-radius:16px;box-shadow:0 14px 40px rgba(9,30,66,.18);padding:20px;text-align:center">
-    <div style="display:inline-flex;width:72px;height:72px;border-radius:50%;background:#eafaf1;align-items:center;justify-content:center;border:2px solid #b7f0cb;animation:popin .25s ease-out">
-      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#26a269" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 6L9 17l-5-5"/>
-      </svg>
-    </div>
-    <div style="font-weight:800;font-size:18px;margin-top:10px;color:#0b1724">Payment Verified Successfully — Item Unlocked!</div>
-    <div style="margin-top:6px;color:#5b6b7a;font-size:13px">You can now download your item.</div>
-  </div>
+<div class="modal" id="adminModal">
+<div class="box">
+<h3>Admin</h3>
+<div id="adminBody">
+<div class="field"><input id="pin" placeholder="Enter PIN (default 2468)" type="password"/></div>
+<button class="btn primary" id="pinGo">Open</button>
+</div>
+<div class="row"><button class="btn" id="closeAdmin">Close</button></div>
+</div>
+</div>
+<!-- Floating admin button (shows only when scrolled to bottom) -->
+<div class="float-admin" id="floatAdmin" title="Admin panel (PIN required)">⚙</div>
+<div id="successPopup" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(9,30,66,.15);backdrop-filter:blur(2px);z-index:80">
+<div style="width:min(420px,92%);background:#fff;border:1px solid #e6eef8;border-radius:16px;box-shadow:0 14px 40px rgba(9,30,66,.18);padding:20px;text-align:center">
+<div style="display:inline-flex;width:72px;height:72px;border-radius:50%;background:#eafaf1;align-items:center;justify-content:center;border:2px solid #b7f0cb;animation:popin .25s ease-out">
+<svg fill="none" height="40" stroke="#26a269" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="40">
+<path d="M20 6L9 17l-5-5"></path>
+</svg>
+</div>
+<div style="font-weight:800;font-size:18px;margin-top:10px;color:#0b1724">Payment Verified Successfully — Item Unlocked!</div>
+<div style="margin-top:6px;color:#5b6b7a;font-size:13px">You can now download your item.</div>
+</div>
 </div>
 <style>
 @keyframes popin { from{ transform:scale(.8); opacity:.0 } to{ transform:scale(1); opacity:1 } }
 </style>
 <footer><div class="container">© <span id="year"></span> Digital Store. Demo only.</div></footer>
-
 <script>
 // ------- Data Model (localStorage) --------
 const DEFAULT_DATA = {
   posters: ["poster.mp4","poster1.mp4","poster2.mp4","poster3.mp4","poster4.mp4"],
   categories: [
     { key:"hack_charts",    title:"Hack charts",    thumb:"hack.png",   items:[
-      {file:"hack2.png", price:99},{file:"hack3.png", price:99},{file:"hack4.png", price:99},{file:"hack5.png", price:99},{file:"hack6.png", price:99}
+      {file:"hack2.png", title:"Hack chart", price:99},{file:"hack3.png", title:"Hack chart 2", price:99},{file:"hack4.png", title:"Hack chart 3", price:99},{file:"hack5.png", title:"Hack chart 4", price:99},{file:"hack6.png", title:"Hack chart 5", price:99}
     ]},
     { key:"hack_apk",       title:"Hack apk",       thumb:"app.png",    items:[
-      {file:"app1.apk", price:199},{file:"app2.apk", price:199},{file:"app3.apk", price:199},{file:"app4.apk", price:199},{file:"app5.apk", price:199}
+      {file:"app1.apk", price:200},{file:"app2.apk", price:200},{file:"app3.apk", price:199},{file:"app4.apk", price:199},{file:"app5.apk", price:199}
     ]},
     { key:"suresort",       title:"SURESORT prediction", thumb:"suresort.png", items:[
-      {file:"prediction.html", price:0, note:"Opens a separate page"}
+      {file:"prediction.html", price:249, note:"Opens after payment"}
     ]},
     { key:"under3",         title:"Under 3 level Trick", thumb:"thumb.png", items:[
       {file:"thumb1.mp4", price:149},{file:"thumb2.mp4", price:149},{file:"thumb3.mp4", price:149},{file:"thumb4.mp4", price:149},{file:"thumb5.mp4", price:149}
@@ -200,71 +189,37 @@ const DEFAULT_DATA = {
   orders:{} // map "catKey|index" -> {paid:true}
 };
 
-function loadStore(){
-  const raw = localStorage.getItem("store.v1");
-  if(!raw){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
-  try{ return JSON.parse(raw); }catch(e){ localStorage.setItem("store.v1", JSON.stringify(DEFAULT_DATA)); return structuredClone(DEFAULT_DATA); }
-}
-function saveStore(data){ localStorage.setItem("store.v1", JSON.stringify(data)); }
+function loadStore(){ return structuredClone(DEFAULT_DATA); }
+function saveStore(data){}
 let STORE = loadStore();
-
 
 // ------- Poster Carousel -------
 const car = document.getElementById("carousel");
 const dots = document.getElementById("dots");
 let carIndex = 0;
 let carVideos = [];
-let autoTimer=null;
-
-function makeVideo(src, isActive){
-  const v = document.createElement("video");
-  v.src = src;
-  v.muted = true;
-  v.autoplay = true;
-  v.loop = true;
-  v.playsInline = true;
-  v.setAttribute("muted","");
-  v.setAttribute("autoplay","");
-  v.setAttribute("playsinline","");
-  v.setAttribute("preload","auto");
-  v.className = isActive ? "active" : "";
-  v.addEventListener('canplay', ()=>{ if(v.classList.contains('active')) { v.play().catch(()=>{}); } });
-  return v;
-}
-
 function buildCarousel(){
   car.innerHTML = ""; dots.innerHTML = "";
   carVideos = STORE.posters.map((src,i)=>{
-    const v = makeVideo(src, i===0);
+    const v = document.createElement("video");
+    v.src = src; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true; v.setAttribute("preload","metadata");
+    if(i!==0) v.style.display="none";
     car.appendChild(v);
-    const d=document.createElement("div");
-    d.className="dot"+(i===0?" active":"");
-    d.dataset.i=i;
+    const d=document.createElement("div"); d.className="dot"+(i===0?" active":""); d.dataset.i=i; dots.appendChild(d);
     d.onclick=()=>showSlide(i);
-    dots.appendChild(d);
     return v;
   });
-  if(autoTimer) clearInterval(autoTimer);
-  autoTimer = setInterval(()=>showSlide(carIndex+1), 8000);
 }
-
 function showSlide(i){
   if(!carVideos.length) return;
-  const cur = carVideos[carIndex];
-  dots.children[carIndex].classList.remove("active");
-  cur.classList.remove("active");
-  try{ cur.pause(); cur.currentTime = 0; }catch(e){}
-
-  carIndex = (i + carVideos.length) % carVideos.length;
-  const nxt = carVideos[carIndex];
-  dots.children[carIndex].classList.add("active");
-  nxt.classList.add("active");
-  try{ nxt.play().catch(()=>{}); }catch(e){}
+  carVideos[carIndex].style.display="none"; dots.children[carIndex].classList.remove("active");
+  carIndex = (i+carVideos.length)%carVideos.length;
+  carVideos[carIndex].style.display="block"; dots.children[carIndex].classList.add("active");
+  carVideos[carIndex].play().catch(()=>{});
 }
-
 document.getElementById("prevBtn").onclick=()=>showSlide(carIndex-1);
 document.getElementById("nextBtn").onclick=()=>showSlide(carIndex+1);
-
+let autoTimer=setInterval(()=>showSlide(carIndex+1), 8000);
 
 // ------- Catalog Render -------
 const catalog = document.getElementById("catalog");
@@ -289,13 +244,13 @@ function renderCatalog(){
       card.innerHTML = `
         <div class="thumb"><img alt="${it.file}" src="${thumbFor(it.file)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(it.file))}'"></div>
         <div class="content">
-          <div class="title">${it.file}</div>
+          <div class="title">${it.title || it.file}</div>
           <div class="row">
             <span class="price">₹${it.price || 0}</span>
             ${paid ? `<span class="pill">Unlocked</span>` : `<span class="pill">Locked</span>`}
           </div>
           <div class="row">
-            ${cat.key==="suresort" ? `<a class="btn primary" href="prediction.html">Open</a>`
+            ${cat.key==="suresort" ? `<button class="btn primary" data-act="buy" data-ci="${ci}" data-ii="${ii}">Buy</button>`
               : paid ? `<a class="btn success" href="${it.file}" download>Download</a>`
                      : `<button class="btn primary" data-act="buy" data-ci="${ci}" data-ii="${ii}">Buy</button>`}
             <button class="btn" data-act="preview" data-ci="${ci}" data-ii="${ii}">Preview</button>
@@ -384,7 +339,8 @@ function openBuy(ci,ii){
   // fill modal
   document.getElementById("buyTitle").textContent = `Pay & Get Item`;
   document.getElementById("buyThumb").src = thumbFor(it.file);
-  document.getElementById("buyName").textContent = it.file;
+  document.getElementById("buyThumb").classList.add("blur");
+  document.getElementById("buyName").textContent = it.title || it.file;
   document.getElementById("buyPrice").textContent = `Price: ₹${it.price || 0}`;
   document.getElementById("amount").textContent = `₹${it.price || 0}`;
 
@@ -459,6 +415,7 @@ function openBuy(ci,ii){
     renderCatalog();
     showSuccessPopup();
     document.getElementById("buyModal").style.display = 'none';
+    try{ document.getElementById('buyThumb').classList.remove('blur'); }catch(e){}
   };
 
   document.getElementById("buyModal").style.display = 'flex';
@@ -466,7 +423,7 @@ function openBuy(ci,ii){
 function preview(ci,ii){
   ci=+ci; ii=+ii;
   const cat = STORE.categories[ci], it = cat.items[ii];
-  alert(`Preview: ${it.file}\n(Provide a real preview file/URL for better UX)`);
+  alert(`Preview: ${it.title || it.file}\n(Provide a real preview file/URL for better UX)`);
 }
 
 // ------- Admin (PIN 2468). Only filename & price editable -------
@@ -492,8 +449,9 @@ document.getElementById("pinGo").onclick=()=>{
       const row = document.createElement("div"); row.className="field";
       row.innerHTML = `
         <label>Item ${ii+1}</label>
+        <input data-ci="${ci}" data-ii="${ii}" data-k="title" value="${it.title || it.file}" placeholder="Item title (shown to users)" />
         <input data-ci="${ci}" data-ii="${ii}" data-k="file" value="${it.file}" />
-        <input data-ci="${ci}" data-ii="${ii}" data-k="price" type="number" min="0" value="${it.price||0}" />
+        <input data-ci="${ci}" data-ii="${ii}" data-k="price" type="number" min="0" value="${it.price||0}" ${cat.key==="suresort" ? "readonly" : ""} />
       `;
       details.appendChild(row);
     });
@@ -522,23 +480,87 @@ window.addEventListener("scroll", checkScroll);
 window.addEventListener("resize", checkScroll);
 checkScroll();
 
-// ------- Init -------
-buildCarousel();
-renderCatalog();
-document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+// ------- Firebase Realtime Binding -------
+(function(){
+  const applyRender = (data)=>{ STORE = data || DEFAULT_DATA; renderCatalog(); };
+  if (window.__ref) {
+    const storeRef = window.__ref('storeData');
+    window.__onValue(storeRef, (snap)=>{
+      const val = snap.val();
+      if(val){ STORE = val; }
+      else { STORE = DEFAULT_DATA; window.__set(storeRef, DEFAULT_DATA); }
+      renderCatalog();
+    });
+    window.saveStore = (data)=>window.__update(storeRef, data);
+  } else {
+    console.warn('Firebase not available — using local default data.');
+    applyRender(DEFAULT_DATA);
+    window.saveStore = (data)=>{ try{ localStorage.setItem('store.v1', JSON.stringify(data)); }catch(e){} };
+  }
+})();
 
+// ------- Init -------
+try{ buildCarousel(); }catch(e){}
+try{ if(typeof renderCatalog==='function') renderCatalog(); }catch(e){}
+try{ document.getElementById("year").textContent = new Date().getFullYear(); }catch(e){}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
 <script>
-function showSuccessPopup(){
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBs7eQyMrcN8kJWMHl2ac2UZHlYQ6DypD8",
+    authDomain: "terminal-xxrr.firebaseapp.com",
+    databaseURL: "https://terminal-xxrr-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "terminal-xxrr",
+    storageBucket: "terminal-xxrr.firebasestorage.app",
+    messagingSenderId: "722753278120",
+    appId: "1:722753278120:web:bfa37aab39635a4e57f29d",
+    measurementId: "G-E3MZH3E1K5"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Expose helpers to window for non-module scripts
+  window.__db = db;
+  window.__ref = (path)=>ref(db, path);
+  window.__onValue = onValue;
+  window.__set = set;
+  window.__update = update;
+  window.__get = get;
+</script>
+<script>
+function showSuccessPopup(file, isPrediction){
   const el = document.getElementById('successPopup');
   if(!el) return;
   el.style.display = 'flex';
-  setTimeout(()=>{ el.style.display='none'; }, 3000);
+  setTimeout(()=>{ 
+    el.style.display='none'; 
+    if(isPrediction || file === 'prediction.html'){
+      alert('✅ Payment verified — Opening Prediction page...');
+      window.location.href = 'prediction.html';
+    } else if(file){
+      const msg = document.createElement('div');
+      msg.innerText = '✅ Download starting...';
+      msg.style.position='fixed';
+      msg.style.top='50%';
+      msg.style.left='50%';
+      msg.style.transform='translate(-50%,-50%)';
+      msg.style.background='#fff';
+      msg.style.color='#0b1724';
+      msg.style.padding='14px 20px';
+      msg.style.borderRadius='8px';
+      msg.style.boxShadow='0 4px 20px rgba(0,0,0,.2)';
+      document.body.appendChild(msg);
+      setTimeout(()=>{ msg.remove(); window.location.href = file; },2000);
+    }
+  }, 2000);
 }
-</script>
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-</body>
+</script></body>
 </html>
