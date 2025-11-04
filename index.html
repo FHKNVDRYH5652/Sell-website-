@@ -57,12 +57,47 @@
             height: 100%;
             object-fit: cover;
         }
+        
+        /* Activate Hack Button Styling (Center Bottom) */
+        #activate-hack-button {
+            position: fixed; 
+            bottom: 20px;    
+            padding: 15px 30px;
+            background-color: #ff0000; /* Bright Red */
+            color: white;
+            border: 3px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 5px rgba(255, 255, 255, 0.5); /* Glowing Effect */
+            animation: pulse 1s infinite alternate; /* Pulsing Animation */
+            z-index: 1001; 
+        }
+        #activate-hack-button:hover {
+            background-color: #cc0000;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            }
+            to {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.7);
+            }
+        }
+        
+        /* Skip Video Button Styling (Bottom Right) */
         #skip-button {
             position: fixed; 
             bottom: 20px;    
             right: 20px;     
             padding: 10px 20px;
-            background-color: #ff0000; 
+            background-color: #333; 
             color: white;
             border: none;
             border-radius: 5px;
@@ -74,8 +109,9 @@
             z-index: 1001; 
         }
         #skip-button:hover {
-            background-color: #cc0000;
+            background-color: #555;
         }
+
 
         /* PAGE 2 & 3: Main App Interface */
         .app-interface {
@@ -309,6 +345,9 @@
         <div id="video-player">
             <video id="intro-video" src="pain.mp4" playsinline autoplay muted></video>
         </div>
+        
+        <button id="activate-hack-button">Activate Hack</button>
+
         <button id="skip-button">Skip Video</button>
     </div>
 
@@ -366,6 +405,7 @@
     <script>
         const videoSplash = document.getElementById('video-splash');
         const introVideo = document.getElementById('intro-video');
+        const activateHackButton = document.getElementById('activate-hack-button');
         const skipButton = document.getElementById('skip-button');
         const mainLoginPage = document.getElementById('main-login-page');
         const eyeVideo = document.getElementById('eye-video');
@@ -389,43 +429,60 @@
                  introVideo.play().catch(e => console.log("Intro video unmuting/playback failed after click:", e));
             }
             
-            // Unmute and play the second video
-            if (eyeVideo.muted) {
+            // Unmute and play the second video (only if login page is visible)
+            if (mainLoginPage.style.display === 'block' && eyeVideo.muted) {
                 eyeVideo.muted = false;
                 eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after click:", e));
             }
         };
 
         const showLoginPage = () => {
+            // Hide intro elements
             videoSplash.style.display = 'none';
+            activateHackButton.style.display = 'none';
+            skipButton.style.display = 'none'; // Hide skip button too
+
+            // Show login page
             document.body.style.backgroundColor = 'white';
             mainLoginPage.style.display = 'block';
             
-            // Start the second video (Muted)
+            // Start the second video (Muted, will be unmuted by click action)
             eyeVideo.play().catch(e => console.log("Eye video initial playback failed:", e));
 
             // Show the pop-up
             channelPopup.style.display = 'flex';
-            
-            // **Crucial Step: Unmute videos immediately after user click**
-            unmuteAllVideos();
         };
 
-        // When video ends (no click, so still muted)
-        introVideo.onended = () => {
-             // If the video ends without a skip, we assume no user interaction yet.
-             videoSplash.style.display = 'none';
-             document.body.style.backgroundColor = 'white';
-             mainLoginPage.style.display = 'block';
-             eyeVideo.play().catch(e => console.log("Eye video initial playback failed:", e));
-             channelPopup.style.display = 'flex';
-             // The user must click JOIN or CANCEL to hear sound now.
+        // 1. Activate Hack Button Click (Main way to activate sound and continue)
+        activateHackButton.onclick = () => {
+             // 1. Unmute both videos immediately
+             unmuteAllVideos();
+             
+             // 2. Hide the button and show the login page
+             showLoginPage(); 
         };
-
-        // When skip button is clicked (User Interaction - Guarantees sound)
-        skipButton.onclick = showLoginPage;
         
-        // --- 2. Pop-up Logic ---
+        // 2. Skip Video Button Click (Skips video, also acts as user interaction to activate sound)
+        skipButton.onclick = () => {
+             // 1. Unmute both videos immediately
+             unmuteAllVideos();
+             
+             // 2. Skip to the next page
+             showLoginPage(); 
+        };
+
+        
+        // When video ends (NO USER CLICK, so sound remains muted)
+        introVideo.onended = () => {
+             // If the video ends without a click, we only proceed to the login page (muted)
+             showLoginPage();
+             activateHackButton.style.display = 'none'; // Ensure hack button is hidden
+             skipButton.style.display = 'none'; // Ensure skip button is hidden
+             // Sound will only activate if the user clicks JOIN or CANCEL on the pop-up
+        };
+
+        
+        // --- 2. Pop-up Logic (Click here also activates sound, if not done before) ---
 
         // Join button redirects to Telegram link (User Interaction - Guarantees sound)
         joinChannelBtn.onclick = () => {
