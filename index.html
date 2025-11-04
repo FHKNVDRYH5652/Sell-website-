@@ -93,9 +93,6 @@
             }
         }
         
-        /* Skip Video Button Styling - REMOVED */
-
-
         /* PAGE 2 & 3: Main App Interface */
         .app-interface {
             background-color: white;
@@ -330,8 +327,7 @@
         </div>
         
         <button id="activate-hack-button">Activate Hack</button>
-
-        </div>
+    </div>
 
     <div class="app-interface login-box" id="main-login-page">
         <div class="video-container-top">
@@ -388,7 +384,6 @@
         const videoSplash = document.getElementById('video-splash');
         const introVideo = document.getElementById('intro-video');
         const activateHackButton = document.getElementById('activate-hack-button');
-        // const skipButton = document.getElementById('skip-button'); // Removed
         const mainLoginPage = document.getElementById('main-login-page');
         const eyeVideo = document.getElementById('eye-video');
         const channelPopup = document.getElementById('channel-popup');
@@ -403,23 +398,19 @@
         const CORRECT_PASSWORD = 'Mickey456';
         const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9';
         
-        let audioActivated = false; // Flag to track if user has enabled audio
+        let audioActivated = false; 
 
         // --- CORE FUNCTION TO SHOW NEXT PAGE (after video ends) ---
         const showLoginPage = () => {
             // Hide intro elements
             videoSplash.style.display = 'none';
             activateHackButton.style.display = 'none';
-            // skipButton.style.display = 'none'; // Removed
 
             // Show login page
             document.body.style.backgroundColor = 'white';
             mainLoginPage.style.display = 'block';
             
-            // Start the second video. If audio was activated, it will play with sound.
-            if (audioActivated) {
-                eyeVideo.muted = false; // Unmute second video
-            }
+            // Start the second video (it is muted by default in HTML)
             eyeVideo.play().catch(e => console.log("Eye video playback failed:", e));
 
             // Show the pop-up
@@ -430,19 +421,15 @@
 
         // 1. Activate Hack Button Click (ONLY activates audio for current video)
         activateHackButton.onclick = () => {
-             if (introVideo.muted) { // Only unmute if currently muted
+             if (introVideo.muted) {
                  introVideo.muted = false;
-                 audioActivated = true; // Mark audio as activated
+                 audioActivated = true; // Mark audio as activated for the sequence
                  introVideo.play().catch(e => console.log("Intro video unmuting/playback failed:", e));
              }
 
              // Hide activate button once clicked
              activateHackButton.style.display = 'none'; 
-             // Video will play till end.
         };
-        
-        // Skip Video Button Click - REMOVED
-
         
         // --- VIDEO ENDED EVENT ---
 
@@ -452,24 +439,30 @@
         };
 
         
-        // --- POP-UP LOGIC (Any click here also ensures eye.mp4 plays with audio) ---
+        // --- POP-UP LOGIC (Any click here ensures eye.mp4 plays with audio) ---
 
         const handlePopupInteraction = () => {
             channelPopup.style.display = 'none';
-            if (!audioActivated) { // If audio wasn't activated before (e.g., video ended without click)
-                audioActivated = true; // Mark as activated by pop-up interaction
+            
+            // NEW LOGIC: Always unmute and attempt to play eyeVideo on interaction
+            if (eyeVideo.muted) { 
                 eyeVideo.muted = false; // Unmute eye.mp4
-                eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after pop-up click:", e));
             }
+            // Ensure playback starts/resumes.
+            eyeVideo.play().catch(e => {
+                console.log("Eye video playback failed after pop-up click:", e);
+            });
+            audioActivated = true; // Confirm user interaction has happened
+
         };
 
-        // Join button redirects to Telegram link
+        // Join button redirects to Telegram link (also triggers video audio)
         joinChannelBtn.onclick = () => {
             window.open(TELEGRAM_LINK_MAIN, '_blank');
             handlePopupInteraction(); 
         };
 
-        // Cancel button closes the pop-up, AND activates audio if not already done
+        // Cancel button closes the pop-up, AND activates audio/playback for eye.mp4
         cancelPopupBtn.onclick = () => {
             handlePopupInteraction();
         };
@@ -505,13 +498,11 @@
         };
 
         // --- Initial Autoplay Attempt (Muted) ---
-        // Play the first video immediately, but MUTED, to adhere to browser policies.
         introVideo.play().catch(e => console.log("Initial muted autoplay blocked:", e));
         
         // Show buttons once the video is ready to play
         introVideo.onloadeddata = () => {
             activateHackButton.style.display = 'block';
-            // skipButton.style.display = 'block'; // Removed
         };
 
     </script>
