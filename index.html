@@ -16,7 +16,7 @@
             min-height: 100vh;
             background-color: #f0f0f0;
             color: #fff;
-            overflow: hidden; /* Prevent scroll on initial load */
+            overflow: hidden; 
         }
         .container {
             width: 100%;
@@ -58,11 +58,11 @@
             object-fit: cover;
         }
         #skip-button {
-            position: fixed; /* Position the button relative to the viewport */
-            bottom: 20px;    /* 20px from the bottom */
-            right: 20px;     /* 20px from the right */
+            position: fixed; 
+            bottom: 20px;    
+            right: 20px;     
             padding: 10px 20px;
-            background-color: #ff0000; /* Red skip button */
+            background-color: #ff0000; 
             color: white;
             border: none;
             border-radius: 5px;
@@ -71,7 +71,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: background-color 0.3s;
-            z-index: 1001; /* Ensure it's above the video */
+            z-index: 1001; 
         }
         #skip-button:hover {
             background-color: #cc0000;
@@ -85,7 +85,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 350px;
-            color: #000; /* Text color for the main interface */
+            color: #000; 
         }
         .video-container-top {
             width: 100%;
@@ -126,7 +126,7 @@
             max-width: 300px;
         }
         .popup-box h3 {
-            color: #4CAF50; /* Green text for "Official Channel Join" */
+            color: #4CAF50; 
             margin-bottom: 5px;
         }
         .popup-box p {
@@ -142,18 +142,18 @@
             font-weight: bold;
         }
         .popup-buttons .join-btn {
-            background-color: #9900ff; /* Purple for Join */
+            background-color: #9900ff; 
             color: white;
         }
         .popup-buttons .cancel-btn {
-            background-color: #555; /* Dark gray for Cancel */
+            background-color: #555; 
             color: white;
         }
         .popup-icon {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background-image: url('anime1.png'); /* Set popup logo image */
+            background-image: url('anime1.png'); 
             background-size: cover;
             background-position: center;
             margin: 0 auto 15px;
@@ -162,7 +162,7 @@
 
         /* PAGE 3: Login/Password Input */
         .login-box {
-            display: none; /* Hidden until video or skip finishes */
+            display: none; 
         }
         .license-input-wrapper {
             background-color: #eee;
@@ -176,7 +176,7 @@
         .key-text {
             font-size: 18px;
             font-weight: bold;
-            color: #008cba; /* Blue text for "License Key" */
+            color: #008cba; 
             text-shadow: 1px 1px 1px #000;
         }
         #password-input {
@@ -190,7 +190,7 @@
         .login-btn {
             width: 100%;
             padding: 15px;
-            background-color: #ffe400; /* Yellow button */
+            background-color: #ffe400; 
             color: #000;
             border: none;
             border-radius: 8px;
@@ -211,8 +211,8 @@
             margin-bottom: 25px;
             font-size: 18px;
             font-weight: bold;
-            color: #000; /* Changed to black for contrast on white background */
-            text-shadow: 1px 1px #ccc; /* Lighter shadow */
+            color: #000; 
+            text-shadow: 1px 1px #ccc; 
         }
         .red-text { color: #ff0000; }
         .green-text { color: #00ff00; }
@@ -229,12 +229,12 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            text-decoration: none; /* Remove underline for links */
+            text-decoration: none; 
             color: #000;
         }
         .bottom-icon-wrapper span.icon {
             font-size: 40px;
-            line-height: 1; /* Adjust line height for icons */
+            line-height: 1; 
         }
         .bottom-icon-wrapper span.label {
             font-size: 12px;
@@ -245,7 +245,7 @@
 
         /* PAGE 4: Prediction/Tool Page */
         #tool-page {
-            background-color: #2c3e50; /* Dark blue/gray background */
+            background-color: #2c3e50; 
             padding: 40px 20px;
             border-radius: 10px;
             width: 100%;
@@ -253,13 +253,13 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             color: white;
             text-align: center;
-            display: none; /* Hidden initially */
-            background-image: url('anime.png'); /* Background image for tool page */
+            display: none; 
+            background-image: url('anime.png'); 
             background-size: cover;
             background-position: center;
         }
         #tool-page h1 {
-            color: #f1c40f; /* Yellow title */
+            color: #f1c40f; 
             font-size: 28px;
             margin-bottom: 10px;
             text-shadow: 2px 2px #000;
@@ -281,7 +281,7 @@
             box-sizing: border-box;
         }
         #generate-btn {
-            background-color: #e74c3c; /* Red generate button */
+            background-color: #e74c3c; 
             color: white;
             padding: 12px 25px;
             border: none;
@@ -297,7 +297,7 @@
             margin-top: 30px;
             font-size: 24px;
             font-weight: bold;
-            color: #2ecc71; /* Green result text */
+            color: #2ecc71; 
             min-height: 30px;
             text-shadow: 1px 1px #000;
         }
@@ -381,22 +381,18 @@
         const CORRECT_PASSWORD = 'Mickey456';
         const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9';
         
-        // --- 1. Audio and Video Playback Logic ---
-
+        // --- FUNCTION TO UNMUTE VIDEOS AFTER USER INTERACTION ---
         const unmuteAllVideos = () => {
-            // This function is called only after a user interaction (click on skip/end of video)
-            // It tries to unmute all videos to enable sound.
-            
-            // Unmute first video
-            if (!introVideo.ended) {
+            // Unmute and play the first video (if it hasn't ended)
+            if (!introVideo.ended && introVideo.muted) {
                  introVideo.muted = false;
-                 introVideo.play().catch(e => console.log("Intro video unmuting failed:", e));
+                 introVideo.play().catch(e => console.log("Intro video unmuting/playback failed after click:", e));
             }
             
-            // Unmute second video (if it's already visible and paused)
-            if (eyeVideo.style.display !== 'none') {
+            // Unmute and play the second video
+            if (eyeVideo.muted) {
                 eyeVideo.muted = false;
-                eyeVideo.play().catch(e => console.log("Eye video unmuting failed:", e));
+                eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after click:", e));
             }
         };
 
@@ -405,36 +401,43 @@
             document.body.style.backgroundColor = 'white';
             mainLoginPage.style.display = 'block';
             
-            // Start the second video (it's set to autoplay and loop, but muted)
-            eyeVideo.play().catch(e => console.log("Eye video playback failed:", e));
+            // Start the second video (Muted)
+            eyeVideo.play().catch(e => console.log("Eye video initial playback failed:", e));
 
-            // Show the pop-up immediately, this is considered the first user interaction point
+            // Show the pop-up
             channelPopup.style.display = 'flex';
             
-            // UNMUTE: Try to unmute all videos after showing the login page/popup
-            // This is the best attempt at enabling sound after user interaction.
+            // **Crucial Step: Unmute videos immediately after user click**
             unmuteAllVideos();
         };
 
-        // When video ends, show login page
-        introVideo.onended = showLoginPage;
+        // When video ends (no click, so still muted)
+        introVideo.onended = () => {
+             // If the video ends without a skip, we assume no user interaction yet.
+             videoSplash.style.display = 'none';
+             document.body.style.backgroundColor = 'white';
+             mainLoginPage.style.display = 'block';
+             eyeVideo.play().catch(e => console.log("Eye video initial playback failed:", e));
+             channelPopup.style.display = 'flex';
+             // The user must click JOIN or CANCEL to hear sound now.
+        };
 
-        // When skip button is clicked, show login page and attempt to unmute
+        // When skip button is clicked (User Interaction - Guarantees sound)
         skipButton.onclick = showLoginPage;
         
         // --- 2. Pop-up Logic ---
 
-        // Join button redirects to Telegram link
+        // Join button redirects to Telegram link (User Interaction - Guarantees sound)
         joinChannelBtn.onclick = () => {
             window.open(TELEGRAM_LINK_MAIN, '_blank');
             channelPopup.style.display = 'none';
+            unmuteAllVideos(); // Unmute after click
         };
 
-        // Cancel button closes the pop-up, showing the login page underneath
+        // Cancel button closes the pop-up (User Interaction - Guarantees sound)
         cancelPopupBtn.onclick = () => {
             channelPopup.style.display = 'none';
-            // Since the user has clicked, we ensure the second video is unmuted
-            unmuteAllVideos();
+            unmuteAllVideos(); // Unmute after click
         };
 
         // --- 3. Login Logic ---
@@ -445,8 +448,6 @@
                 mainLoginPage.style.display = 'none';
                 toolPage.style.display = 'block';
                 document.body.style.backgroundColor = 'transparent';
-                
-                // Stop the eye video when moving to the tool page
                 eyeVideo.pause(); 
             } else {
                 alert('Incorrect Password. Please try again.');
@@ -472,7 +473,7 @@
         };
 
         // --- Initial Autoplay Attempt (Muted) ---
-        // Play the first video immediately, but muted, to adhere to browser policies.
+        // Play the first video immediately, but MUTED, to adhere to browser policies.
         introVideo.play().catch(e => console.log("Initial muted autoplay blocked:", e));
 
 
