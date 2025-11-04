@@ -1,566 +1,448 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Digital Store — Simple Buy &amp; Download</title>
-<style>
-    :root{
-      --bg:#ffffff; --card:#f7f8fb; --text:#0b1724; --muted:#5b6b7a; --accent:#2774ff; --ok:#26d07c; --warn:#ffb020; --danger:#ff6b6b;
-      --shadow:0 6px 20px rgba(9,30,66,.08);
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
-    a{color:var(--accent);text-decoration:none}
-    .container{max-width:1100px;margin:auto;padding:16px}
-    header{position:sticky;top:0;background:rgba(255,255,255,0.9);backdrop-filter:blur(6px);z-index:10;border-bottom:1px solid #e6ebf2}
-    .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
-    .brand{font-weight:800;letter-spacing:.2px}
-    .btn{padding:8px 12px;border:1px solid #e3eaf6;background:#fff;color:var(--text);border-radius:10px;cursor:pointer;box-shadow:var(--shadow);transition:.15s}
-    .btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(9,30,66,.08)}
-    .btn.primary{background:linear-gradient(135deg,#2774ff,#6aa9ff);border-color:#2d6cff;color:#fff}
-    .btn.success{background:linear-gradient(135deg,#18a86b,#26d07c);border-color:#19a567;color:#fff}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid #e6eef8;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-    .thumb{height:150px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e6eef8}
-    .thumb img,.thumb video{max-width:100%;max-height:100%}
-    .content{padding:12px}
-    .title{font-size:16px;font-weight:700;margin:0 0 6px}
-    .sub{font-size:13px;color:var(--muted)}
-    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:10px}
-    .price{font-weight:800}
-    .pill{font-size:12px;padding:4px 8px;background:#fff;border:1px solid #e3eaf6;border-radius:999px;color:#5b6b7a}
-    .section{margin:24px 0}
-    .section h2{margin:0 0 8px;font-size:22px;color:var(--text)}
-    .carousel{position:relative;border-radius:12px;overflow:hidden;border:1px solid #e6eef8;background:#fff}
-    .carousel video{width:100%;height:300px;object-fit:cover}
-    .car-ctrl{position:absolute;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;width:100%}
-    .car-ctrl button{background:rgba(255,255,255,.9);border:1px solid #e6eef8;border-radius:999px;width:44px;height:44px;margin:0 8px;color:var(--text);font-size:18px;cursor:pointer}
-    .dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:6px;justify-content:center}
-    .dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;border:1px solid #f0f5fb}
-    .dot.active{background:var(--accent)}
-    footer{opacity:.9;padding:24px 0;text-align:center}
-    .lock{opacity:.85}
-    /* modal */
-    .modal{position:fixed;inset:0;background:rgba(9,30,66,.06);display:none;align-items:center;justify-content:center;z-index:50}
-    .modal .box{background:var(--card);border:1px solid #e6eef8;border-radius:12px;box-shadow:var(--shadow);width:min(540px,92%);padding:16px}
-    .box h3{margin:0 0 8px;color:var(--text)}
-    .field{display:flex;flex-direction:column;gap:6px;margin:8px 0}
-    .field input{padding:10px 12px;border-radius:8px;border:1px solid #e6eef8;background:#fff;color:var(--text)}
-    .admin-panel{margin-top:12px;padding:12px;border:1px dashed #e6eef8;border-radius:12px}
-    details{background:#fff;border:1px solid #e6eef8;border-radius:12px;padding:10px}
-    summary{cursor:pointer;font-weight:700}
-    .tiny{font-size:12px;color:var(--muted)}
-    /* floating admin button */
-    .float-admin{position:fixed;right:18px;bottom:18px;width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 30px rgba(39,116,255,.18);cursor:pointer;z-index:60;display:none}
-  
-.card.lock .thumb img { filter: blur(6px); transition: filter .3s ease; }
-.card.lock:hover .thumb img { filter: blur(5px); }
-#buyThumb.blur { filter: blur(6px); }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akatsuki Project Login</title>
+    <style>
+        /* General Reset and Font */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            color: #fff;
+            overflow: hidden; /* Prevent scroll on initial load */
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            text-align: center;
+        }
 
-</style>
+        /* --- Page Styling --- */
+
+        /* PAGE 1: Video Splash Screen */
+        #video-splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #video-player {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            background-color: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #skip-button {
+            position: fixed; /* Position the button relative to the viewport */
+            bottom: 20px;    /* 20px from the bottom */
+            right: 20px;     /* 20px from the right */
+            padding: 10px 20px;
+            background-color: #ff0000; /* Red skip button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s;
+            z-index: 1001; /* Ensure it's above the video */
+        }
+        #skip-button:hover {
+            background-color: #cc0000;
+        }
+
+        /* PAGE 2 & 3: Main App Interface */
+        .app-interface {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 350px;
+            color: #000; /* Text color for the main interface */
+        }
+        .video-container-top {
+            width: 100%;
+            height: 180px;
+            background-color: #000;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-container-top video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* PAGE 2: Join Channel Pop-up */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        .popup-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        .popup-box h3 {
+            color: #4CAF50; /* Green text for "Official Channel Join" */
+            margin-bottom: 5px;
+        }
+        .popup-box p {
+            color: #333;
+            font-size: 14px;
+        }
+        .popup-buttons button {
+            padding: 10px 20px;
+            margin: 10px 5px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .popup-buttons .join-btn {
+            background-color: #9900ff; /* Purple for Join */
+            color: white;
+        }
+        .popup-buttons .cancel-btn {
+            background-color: #555; /* Dark gray for Cancel */
+            color: white;
+        }
+        .popup-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-image: url('anime1.png'); /* Set popup logo image */
+            background-size: cover;
+            background-position: center;
+            margin: 0 auto 15px;
+            border: 2px solid #000;
+        }
+
+        /* PAGE 3: Login/Password Input */
+        .login-box {
+            display: none; /* Hidden until video or skip finishes */
+        }
+        .license-input-wrapper {
+            background-color: #eee;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+        }
+        .key-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #008cba; /* Blue text for "License Key" */
+            text-shadow: 1px 1px 1px #000;
+        }
+        #password-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            outline: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #ffe400; /* Yellow button */
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ccb700;
+            transition: background-color 0.1s;
+        }
+        .login-btn:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        /* Themed Text */
+        .themed-quote {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #000; /* Changed to black for contrast on white background */
+            text-shadow: 1px 1px #ccc; /* Lighter shadow */
+        }
+        .red-text { color: #ff0000; }
+        .green-text { color: #00ff00; }
+
+        /* Bottom Icons */
+        .bottom-icons {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 30px;
+        }
+        .bottom-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            text-decoration: none; /* Remove underline for links */
+            color: #000;
+        }
+        .bottom-icon-wrapper span.icon {
+            font-size: 40px;
+            line-height: 1; /* Adjust line height for icons */
+        }
+        .bottom-icon-wrapper span.label {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+
+        /* PAGE 4: Prediction/Tool Page */
+        #tool-page {
+            background-color: #2c3e50; /* Dark blue/gray background */
+            padding: 40px 20px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            color: white;
+            text-align: center;
+            display: none; /* Hidden initially */
+            background-image: url('anime.png'); /* Background image for tool page */
+            background-size: cover;
+            background-position: center;
+        }
+        #tool-page h1 {
+            color: #f1c40f; /* Yellow title */
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px #000;
+        }
+        #tool-page h2 {
+            color: #ecf0f1;
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px #000;
+        }
+        #tool-page input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        #generate-btn {
+            background-color: #e74c3c; /* Red generate button */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #generate-btn:hover {
+            background-color: #c0392b;
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2ecc71; /* Green result text */
+            min-height: 30px;
+            text-shadow: 1px 1px #000;
+        }
+    </style>
 </head>
 <body>
-<header>
-<div class="nav container">
-<div class="brand">Digital Store</div>
-<div style="display:flex;gap:8px;align-items:center">
-<!-- Top buttons removed as requested -->
-</div>
-</div>
-</header>
-<main class="container">
-<!-- Poster Carousel -->
-<section class="section">
-<h2>Posters</h2>
-<div class="carousel" id="carousel">
-<!-- videos injected by JS -->
-<div class="car-ctrl">
-<button id="prevBtn">❮</button>
-<button id="nextBtn">❯</button>
-</div>
-<div class="dots" id="dots"></div>
-</div>
-<div class="tiny">Videos will autoplay (muted). Filenames expected: poster.mp4, poster1.mp4, poster2.mp4, poster3.mp4, poster4.mp4.</div>
-</section>
-<!-- Categories -->
-<section class="section">
-<h2>Categories</h2>
-<div class="grid" id="catalog"></div>
-</section>
-</main>
-<!-- Buy / Verify Modal -->
-<!-- Buy / Payment Modal -->
-<div class="modal" id="buyModal">
-<div class="box">
-<h3 id="buyTitle">Pay &amp; Get Item</h3>
-<div id="buyBody">
-<div style="display:flex;gap:12px;align-items:center">
-<img alt="thumb" id="buyThumb" src="" style="width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid #e6eef8"/>
-<div>
-<div id="buyName" style="font-weight:800"></div>
-<div class="tiny" id="buyPrice" style="margin-top:6px"></div>
-</div>
-</div>
-<div style="margin-top:12px">
-<label class="tiny">Upload Payment Screenshot</label>
-<div style="display:flex;gap:8px;align-items:center">
-<input accept="image/*" id="screenshotFile" type="file"/>
-<div class="tiny muted" id="screenshotName">No file chosen</div>
-</div>
-<div class="tiny" style="margin-top:6px">Upload screenshot to auto-verify</div>
-</div>
-<div style="margin-top:14px;border:1px solid #e6eef8;border-radius:8px;padding:12px;background:#fff">
-<div style="font-weight:700;margin-bottom:6px">Scan &amp; Pay</div>
-<div style="display:flex;gap:12px;align-items:center">
-<div style="width:120px;height:120px;border:1px solid #e6eef8;display:flex;align-items:center;justify-content:center;background:#fafbfd">
-<div id="qrBox" style="width:100px;height:100px;display:flex;align-items:center;justify-content:center;"></div>
-</div>
-<div style="flex:1">
-<div class="tiny muted">UPI ID: <strong id="upiId">your-upi@bank</strong></div>
-<div class="tiny muted" style="margin-top:6px">Note: <span id="note">ORDER-XXXXX</span></div>
-<div style="margin-top:10px"><strong>Amount: <span id="amount">₹0</span></strong></div>
-<div style="margin-top:8px"><button class="btn" id="copyUpi">Copy UPI</button></div>
-</div>
-</div>
-</div>
-<div style="margin-top:12px">
-<label class="tiny">UTR / Transaction ID</label>
-<input id="utrInput" placeholder="Enter UTR after payment"/>
-</div>
-<div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-<div class="tiny muted" id="screenshotStatus">Waiting for screenshot...</div>
-<div style="flex:1"></div>
-<button class="btn primary" id="verifyBtn">Verify</button>
-</div>
-</div>
-<div class="row" style="margin-top:12px">
-<button class="btn" id="closeBuy">Close</button>
-</div>
-</div>
-</div>
-<!-- Admin Modal -->
-<div class="modal" id="adminModal">
-<div class="box">
-<h3>Admin</h3>
-<div id="adminBody">
-<div class="field"><input id="pin" placeholder="Enter PIN (default 2468)" type="password"/></div>
-<button class="btn primary" id="pinGo">Open</button>
-</div>
-<div class="row"><button class="btn" id="closeAdmin">Close</button></div>
-</div>
-</div>
-<!-- Floating admin button (shows only when scrolled to bottom) -->
-<div class="float-admin" id="floatAdmin" title="Admin panel (PIN required)">⚙</div>
-<div id="successPopup" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(9,30,66,.15);backdrop-filter:blur(2px);z-index:80">
-<div style="width:min(420px,92%);background:#fff;border:1px solid #e6eef8;border-radius:16px;box-shadow:0 14px 40px rgba(9,30,66,.18);padding:20px;text-align:center">
-<div style="display:inline-flex;width:72px;height:72px;border-radius:50%;background:#eafaf1;align-items:center;justify-content:center;border:2px solid #b7f0cb;animation:popin .25s ease-out">
-<svg fill="none" height="40" stroke="#26a269" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="40">
-<path d="M20 6L9 17l-5-5"></path>
-</svg>
-</div>
-<div style="font-weight:800;font-size:18px;margin-top:10px;color:#0b1724">Payment Verified Successfully — Item Unlocked!</div>
-<div style="margin-top:6px;color:#5b6b7a;font-size:13px">You can now download your item.</div>
-</div>
-</div>
-<style>
-@keyframes popin { from{ transform:scale(.8); opacity:.0 } to{ transform:scale(1); opacity:1 } }
-</style>
-<footer><div class="container">© <span id="year"></span> Digital Store. Demo only.</div></footer>
-<script>
-// ------- Data Model (localStorage) --------
-const DEFAULT_DATA = {
-  posters: ["poster.mp4","poster1.mp4","poster2.mp4","poster3.mp4","poster4.mp4"],
-  categories: [
-    { key:"hack_charts",    title:"Hack charts",    thumb:"hack.png",   items:[
-      {file:"hack2.png", title:"Hack chart", price:99},{file:"hack3.png", title:"Hack chart 2", price:99},{file:"hack4.png", title:"Hack chart 3", price:99},{file:"hack5.png", title:"Hack chart 4", price:99},{file:"hack6.png", title:"Hack chart 5", price:99}
-    ]},
-    { key:"hack_apk",       title:"Hack apk",       thumb:"app.png",    items:[
-      {file:"app1.apk", price:200},{file:"app2.apk", price:200},{file:"app3.apk", price:199},{file:"app4.apk", price:199},{file:"app5.apk", price:199}
-    ]},
-    { key:"suresort",       title:"SURESORT prediction", thumb:"suresort.png", items:[
-      {file:"prediction.html", price:249, note:"Opens after payment"}
-    ]},
-    { key:"under3",         title:"Under 3 level Trick", thumb:"thumb.png", items:[
-      {file:"thumb1.mp4", price:149},{file:"thumb2.mp4", price:149},{file:"thumb3.mp4", price:149},{file:"thumb4.mp4", price:149},{file:"thumb5.mp4", price:149}
-    ]}
-  ],
-  orders:{} // map "catKey|index" -> {paid:true}
-};
 
-function loadStore(){ return structuredClone(DEFAULT_DATA); }
-function saveStore(data){}
-let STORE = loadStore();
+    <div id="video-splash">
+        <div id="video-player">
+            <video id="intro-video" src="pain.mp4" playsinline autoplay muted></video>
+        </div>
+        <button id="skip-button">Skip Video</button>
+    </div>
 
-// ------- Poster Carousel -------
-const car = document.getElementById("carousel");
-const dots = document.getElementById("dots");
-let carIndex = 0;
-let carVideos = [];
-function buildCarousel(){
-  car.innerHTML = ""; dots.innerHTML = "";
-  carVideos = STORE.posters.map((src,i)=>{
-    const v = document.createElement("video");
-    v.src = src; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true; v.setAttribute("preload","metadata");
-    if(i!==0) v.style.display="none";
-    car.appendChild(v);
-    const d=document.createElement("div"); d.className="dot"+(i===0?" active":""); d.dataset.i=i; dots.appendChild(d);
-    d.onclick=()=>showSlide(i);
-    return v;
-  });
-}
-function showSlide(i){
-  if(!carVideos.length) return;
-  carVideos[carIndex].style.display="none"; dots.children[carIndex].classList.remove("active");
-  carIndex = (i+carVideos.length)%carVideos.length;
-  carVideos[carIndex].style.display="block"; dots.children[carIndex].classList.add("active");
-  carVideos[carIndex].play().catch(()=>{});
-}
-document.getElementById("prevBtn").onclick=()=>showSlide(carIndex-1);
-document.getElementById("nextBtn").onclick=()=>showSlide(carIndex+1);
-let autoTimer=setInterval(()=>showSlide(carIndex+1), 8000);
+    <div class="app-interface login-box" id="main-login-page">
+        <div class="video-container-top">
+            <video id="eye-video" src="eye.mp4" playsinline autoplay loop muted></video>
+        </div>
 
-// ------- Catalog Render -------
-const catalog = document.getElementById("catalog");
-function renderCatalog(){
-  catalog.innerHTML = "";
-  STORE.categories.forEach((cat,ci)=>{
-    // category card header
-    const wrap = document.createElement("div"); wrap.className="card";
-    wrap.innerHTML = `
-      <div class="thumb"><img alt="${cat.title}" src="${cat.thumb}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(cat.title))}'"></div>
-      <div class="content">
-        <div class="title">${cat.title}</div>
-        <div class="sub">Items: ${cat.items.length}</div>
-      </div>`;
-    catalog.appendChild(wrap);
+        <form id="login-form">
+            <div class="license-input-wrapper">
+                <span class="key-text">LICENSE KEY</span>
+                <input type="password" id="password-input" placeholder="Input password" required>
+            </div>
 
-    // items grid per category
-    cat.items.forEach((it,ii)=>{
-      const key = `${cat.key}|${ii}`;
-      const paid = !!STORE.orders[key]?.paid || it.price===0;
-      const card = document.createElement("div"); card.className="card"+(paid?"":" lock");
-      card.innerHTML = `
-        <div class="thumb"><img alt="${it.file}" src="${thumbFor(it.file)}" onerror="this.src='data:image/svg+xml;utf8,${encodeURIComponent(svgPlaceholder(it.file))}'"></div>
-        <div class="content">
-          <div class="title">${it.title || it.file}</div>
-          <div class="row">
-            <span class="price">₹${it.price || 0}</span>
-            ${paid ? `<span class="pill">Unlocked</span>` : `<span class="pill">Locked</span>`}
-          </div>
-          <div class="row">
-            ${cat.key==="suresort" ? `<button class="btn primary" data-act="buy" data-ci="${ci}" data-ii="${ii}">Buy</button>`
-              : paid ? `<a class="btn success" href="${it.file}" download>Download</a>`
-                     : `<button class="btn primary" data-act="buy" data-ci="${ci}" data-ii="${ii}">Buy</button>`}
-            <button class="btn" data-act="preview" data-ci="${ci}" data-ii="${ii}">Preview</button>
-          </div>
-        </div>`;
-      catalog.appendChild(card);
-    });
-  });
+            <button type="submit" class="login-btn">LOGIN</button>
+        </form>
 
-  // attach listeners
-  catalog.querySelectorAll("button[data-act='buy']").forEach(btn=>btn.onclick=()=>openBuy(btn.dataset.ci, btn.dataset.ii));
-  catalog.querySelectorAll("button[data-act='preview']").forEach(btn=>btn.onclick=()=>preview(btn.dataset.ci, btn.dataset.ii));
-}
-function thumbFor(file){
-  const lower = file.toLowerCase();
-  if(lower.endsWith(".png")||lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".gif")) return file;
-  if(lower.endsWith(".mp4")||lower.endsWith(".webm")||lower.endsWith(".mov")) return "thumb.png";
-  if(lower.endsWith(".apk")) return "app.png";
-  return "suresort.png";
-}
-function svgPlaceholder(text){
-  const bg = "%23ffffff", fg = "%232774ff";
-  return `<svg xmlns='http://www.w3.org/2000/svg' width='480' height='300'><rect width='100%' height='100%' fill='${bg}'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='${fg}' font-family='Arial' font-size='20'>${text}</text></svg>`;
-}
+        <p class="themed-quote">I'VE GROWN FROM <span class="red-text">MAN</span> TO <span class="green-text">GOD</span></p>
 
+        <div class="bottom-icons">
+            <a href="https://t.me/+hzN8Ci0F7aYzMmY9" target="_blank" class="bottom-icon-wrapper">
+                <span class="icon">✈️</span>
+                <span class="label">TELEGRAM</span>
+            </a>
+            <a href="https://t.me/Predict456" target="_blank" class="bottom-icon-wrapper">
+                <span class="icon">🔑</span>
+                <span class="label">KEY</span>
+            </a>
+        </div>
+    </div>
 
-// ---- Amount-in-words helpers ----
-const BELOW_20 = ["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-const TENS = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+    <div class="popup-overlay" id="channel-popup">
+        <div class="popup-box">
+            <div class="popup-icon"></div>
+            <h3>OFFICIAL CHANNEL JOIN</h3>
+            <p>Get latest updates and announcements in our Community Channel.</p>
+            <div class="popup-buttons">
+                <button class="join-btn" id="join-channel-btn">JOIN</button>
+                <button class="cancel-btn" id="cancel-popup-btn">CANCEL</button>
+            </div>
+        </div>
+    </div>
 
-function hundredToWords(n){
-  let out=[];
-  if(n>=100){ out.push(BELOW_20[Math.floor(n/100)]+" hundred"); n%=100; }
-  if(n>=20){ out.push(TENS[Math.floor(n/10)] + (n%10? " " + BELOW_20[n%10]:"")); }
-  else if(n>0){ out.push(BELOW_20[n]); }
-  if(out.length===0) return "zero";
-  return out.join(" ");
-}
+    <div id="tool-page">
+        <h1>Mickey Pro Version Tool</h1>
+        <h2>Enter a number to generate a result</h2>
 
-function numberToWords(n){
-  n = Math.round(+n||0);
-  if(n===0) return "zero";
-  const parts=[];
-  const billions = Math.floor(n/1_000_000_000); n%=1_000_000_000;
-  const millions = Math.floor(n/1_000_000); n%=1_000_000;
-  const thousands = Math.floor(n/1000); n%=1000;
-  const hundreds = n;
-  if(billions) parts.push(hundredToWords(billions)+" billion");
-  if(millions) parts.push(hundredToWords(millions)+" million");
-  if(thousands) parts.push(hundredToWords(thousands)+" thousand");
-  if(hundreds) parts.push(hundredToWords(hundreds));
-  return parts.join(" ").replace(/\s+/g," ").trim();
-}
+        <input type="number" id="period-number" placeholder="Enter period number" required>
 
-function normalizeText(t){
-  return (t||"")
-    .toLowerCase()
-    .replace(/[,₹]/g," ")
-    .replace(/\brs\.?\b/g," ")
-    .replace(/\brupees?\b/g," ")
-    .replace(/\bonly\b/g," ")
-    .replace(/[^a-z0-9\s]/g," ")
-    .replace(/\s+/g," ")
-    .trim();
-}
+        <button id="generate-btn">Generate Result</button>
 
-function matchAmountWords(normText, priceWords){
-  if(!normText) return false;
-  const pw = priceWords.toLowerCase().replace(/\s+/g," ").trim();
-  // Try with and without 'and'
-  const withAnd = pw.replace(/ hundred (\w)/, " hundred and $1");
-  return normText.includes(pw) || normText.includes(withAnd);
-}
+        <div id="result"></div>
+    </div>
 
-// ------- Buy Flow (mock verify) -------
-const buyModal = document.getElementById("buyModal");
-const buyBody = document.getElementById("buyBody");
-const buyTitle= document.getElementById("buyTitle");
-document.getElementById("closeBuy").onclick=()=>buyModal.style.display="none";
+    <script>
+        const videoSplash = document.getElementById('video-splash');
+        const introVideo = document.getElementById('intro-video');
+        const skipButton = document.getElementById('skip-button');
+        const mainLoginPage = document.getElementById('main-login-page');
+        const eyeVideo = document.getElementById('eye-video'); // New: reference to the eye video
+        const channelPopup = document.getElementById('channel-popup');
+        const joinChannelBtn = document.getElementById('join-channel-btn');
+        const cancelPopupBtn = document.getElementById('cancel-popup-btn');
+        const loginForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('password-input');
+        const toolPage = document.getElementById('tool-page');
+        const generateBtn = document.getElementById('generate-btn');
+        const resultDiv = document.getElementById('result');
 
+        const CORRECT_PASSWORD = 'Mickey456';
+        const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9'; // Your requested link for join
+        const TELEGRAM_LINK_KEY = 'https://t.me/Predict456'; // Your requested link for key icon
 
-function openBuy(ci,ii){
-  ci=+ci; ii=+ii;
-  const cat = STORE.categories[ci], it = cat.items[ii];
-  const key = `${cat.key}|${ii}`;
-  // fill modal
-  document.getElementById("buyTitle").textContent = `Pay & Get Item`;
-  document.getElementById("buyThumb").src = thumbFor(it.file);
-  document.getElementById("buyThumb").classList.add("blur");
-  document.getElementById("buyName").textContent = it.title || it.file;
-  document.getElementById("buyPrice").textContent = `Price: ₹${it.price || 0}`;
-  document.getElementById("amount").textContent = `₹${it.price || 0}`;
+        // --- 1. Video and Skip Logic ---
 
-  // upi + QR
-  const upiId = "perfect.k@ptaxis";
-  document.getElementById("upiId").textContent = upiId;
-  const orderNote = `ORDER-${Date.now().toString().slice(-10)}`;
-  document.getElementById("note").textContent = orderNote;
-  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent('Digital Store')}&am=${encodeURIComponent(it.price||0)}&cu=INR&tn=${encodeURIComponent(orderNote)}`;
-  const qrUrl = `https://chart.googleapis.com/chart?cht=qr&chs=240x240&chl=${encodeURIComponent(upiUrl)}`;
-  const qrBox = document.getElementById('qrBox');
-  if(qrBox){ qrBox.innerHTML=''; new QRCode(qrBox, {text: upiUrl, width: 100, height: 100}); }
+        const showLoginPage = () => {
+            videoSplash.style.display = 'none';
+            document.body.style.backgroundColor = 'white'; // Change body background for the login page
+            mainLoginPage.style.display = 'block';
+            eyeVideo.play(); // Start playing the eye video
+            // Show the pop-up immediately after the video/skip
+            channelPopup.style.display = 'flex';
+        };
 
-  // reset fields/status
-  document.getElementById("screenshotName").textContent = 'No file chosen';
-  document.getElementById("screenshotStatus").innerHTML = '<span class="badge">Waiting for screenshot…</span>';
-  document.getElementById("utrInput").value = '';
+        // When video ends
+        introVideo.onended = showLoginPage;
 
-  // OCR state
-  let ocrText = '';
-  const fileInput = document.getElementById("screenshotFile");
-  fileInput.value = '';
-  fileInput.onchange = (e)=>{
-    const f = e.target.files[0];
-    if(!f) { document.getElementById("screenshotName").textContent = 'No file chosen'; return; }
-    document.getElementById("screenshotName").textContent = f.name;
-    document.getElementById("screenshotStatus").innerHTML = '<span class="badge">Reading screenshot… 0%</span>';
+        // When skip button is clicked
+        skipButton.onclick = showLoginPage;
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try{
-        const { createWorker } = Tesseract;
-        const worker = await createWorker('eng', 1, { logger: m => {
-          if(m.status==='recognizing text' && m.progress!=null){
-            const pct = Math.round(m.progress*100);
-            document.getElementById("screenshotStatus").innerHTML = `<span class=\"badge\">Reading screenshot… ${pct}%</span>`;
-          }
-        }});
-        const ret = await worker.recognize(reader.result);
-        ocrText = (ret.data && ret.data.text ? ret.data.text : '') || '';
-        await worker.terminate();
-        const norm = normalizeText(ocrText);
-        const priceWords = numberToWords(it.price||0);
-        const matched = matchAmountWords(norm, priceWords);
-        document.getElementById("screenshotStatus").innerHTML = matched
-          ? `<span class=\"badge\" style=\"border-color:#b7f0cb;background:#eafaf1\">Amount words detected: \"${priceWords}\"</span>`
-          : `<span class=\"badge\" style=\"border-color:#ffd5d5;background:#fff7f7\">Amount words NOT detected</span>`;
-      }catch(err){
-        console.error(err);
-        document.getElementById("screenshotStatus").innerHTML = '<span class="badge" style="border-color:#ffd5d5;background:#fff7f7">OCR failed</span>';
-      }
-    };
-    reader.readAsDataURL(f);
-  };
+        // --- 2. Pop-up Logic ---
 
-  // copy upi
-  document.getElementById("copyUpi").onclick = ()=>{
-    navigator.clipboard?.writeText(upiId).then(()=>alert('UPI copied')).catch(()=>alert('Copy failed'));
-  };
+        // Join button redirects to Telegram link
+        joinChannelBtn.onclick = () => {
+            window.open(TELEGRAM_LINK_MAIN, '_blank');
+            channelPopup.style.display = 'none';
+        };
 
-  // verify must match amount words
-  document.getElementById("verifyBtn").onclick = ()=>{
-    const utr = document.getElementById("utrInput").value.trim();
-    const priceWords = numberToWords(it.price||0);
-    const ok = matchAmountWords(normalizeText(ocrText), priceWords);
-    if(!ok){
-      alert('Amount words not found in screenshot. Verification failed.');
-      return;
-    }
-    STORE.orders[key] = { paid:true, ref: utr || 'screenshot-words' };
-    saveStore(STORE);
-    renderCatalog();
-    showSuccessPopup();
-    document.getElementById("buyModal").style.display = 'none';
-    try{ document.getElementById('buyThumb').classList.remove('blur'); }catch(e){}
-  };
+        // Cancel button closes the pop-up, showing the login page underneath
+        cancelPopupBtn.onclick = () => {
+            channelPopup.style.display = 'none';
+        };
 
-  document.getElementById("buyModal").style.display = 'flex';
-}
-function preview(ci,ii){
-  ci=+ci; ii=+ii;
-  const cat = STORE.categories[ci], it = cat.items[ii];
-  alert(`Preview: ${it.title || it.file}\n(Provide a real preview file/URL for better UX)`);
-}
+        // --- 3. Login Logic ---
 
-// ------- Admin (PIN 2468). Only filename & price editable -------
-// Admin button is hidden and appears when user scrolls to bottom
-const adminModal = document.getElementById("adminModal");
-const floatAdmin = document.getElementById("floatAdmin");
-floatAdmin.onclick = ()=>{ adminModal.style.display="flex"; };
-document.getElementById("closeAdmin").onclick=()=>adminModal.style.display="none";
+        loginForm.onsubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                mainLoginPage.style.display = 'none';
+                toolPage.style.display = 'block';
+                document.body.style.backgroundColor = 'transparent'; // Background handled by tool-page itself
+            } else {
+                alert('Incorrect Password. Please try again.');
+                passwordInput.value = '';
+            }
+        };
 
-document.getElementById("pinGo").onclick=()=>{
-  const ok = document.getElementById("pin").value==="2468";
-  if(!ok){ alert("Wrong PIN"); return; }
-  const body = document.getElementById("adminBody");
-  body.innerHTML = "";
-  STORE.categories.forEach((cat,ci)=>{
-    const wrap = document.createElement("div");
-    wrap.className="admin-panel";
-    const details = document.createElement("details");
-    const sum = document.createElement("summary"); sum.textContent = cat.title + ` (${cat.key})`;
-    details.appendChild(sum);
-    // table of items
-    cat.items.forEach((it,ii)=>{
-      const row = document.createElement("div"); row.className="field";
-      row.innerHTML = `
-        <label>Item ${ii+1}</label>
-        <input data-ci="${ci}" data-ii="${ii}" data-k="title" value="${it.title || it.file}" placeholder="Item title (shown to users)" />
-        <input data-ci="${ci}" data-ii="${ii}" data-k="file" value="${it.file}" />
-        <input data-ci="${ci}" data-ii="${ii}" data-k="price" type="number" min="0" value="${it.price||0}" ${cat.key==="suresort" ? "readonly" : ""} />
-      `;
-      details.appendChild(row);
-    });
-    // save button
-    const save = document.createElement("button"); save.className="btn success"; save.textContent="Save changes";
-    save.onclick=()=>{
-      details.querySelectorAll("input").forEach(inp=>{
-        const ci=+inp.dataset.ci, ii=+inp.dataset.ii, k=inp.dataset.k;
-        const val = k==="price" ? Math.max(0, parseInt(inp.value||"0")) : inp.value.trim();
-        STORE.categories[ci].items[ii][k]=val;
-      });
-      saveStore(STORE); renderCatalog(); alert("Saved");
-    };
-    wrap.appendChild(details);
-    wrap.appendChild(save);
-    body.appendChild(wrap);
-  });
-};
+        // --- 4. Tool/Result Generation Logic ---
 
-// Show floating admin button only when scrolled near bottom
-function checkScroll(){
-  const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 20);
-  floatAdmin.style.display = nearBottom ? "flex" : "none";
-}
-window.addEventListener("scroll", checkScroll);
-window.addEventListener("resize", checkScroll);
-checkScroll();
+        generateBtn.onclick = () => {
+            const periodNumber = document.getElementById('period-number').value;
+            if (!periodNumber) {
+                alert('Please enter a period number.');
+                return;
+            }
 
-// ------- Firebase Realtime Binding -------
-(function(){
-  const applyRender = (data)=>{ STORE = data || DEFAULT_DATA; renderCatalog(); };
-  if (window.__ref) {
-    const storeRef = window.__ref('storeData');
-    window.__onValue(storeRef, (snap)=>{
-      const val = snap.val();
-      if(val){ STORE = val; }
-      else { STORE = DEFAULT_DATA; window.__set(storeRef, DEFAULT_DATA); }
-      renderCatalog();
-    });
-    window.saveStore = (data)=>window.__update(storeRef, data);
-  } else {
-    console.warn('Firebase not available — using local default data.');
-    applyRender(DEFAULT_DATA);
-    window.saveStore = (data)=>{ try{ localStorage.setItem('store.v1', JSON.stringify(data)); }catch(e){} };
-  }
-})();
+            // Randomly select 'BIG' or 'SMALL'
+            const outcomes = ['BIG', 'SMALL'];
+            const randomIndex = Math.floor(Math.random() * outcomes.length);
+            const result = outcomes[randomIndex];
 
-// ------- Init -------
-try{ buildCarousel(); }catch(e){}
-try{ if(typeof renderCatalog==='function') renderCatalog(); }catch(e){}
-try{ document.getElementById("year").textContent = new Date().getFullYear(); }catch(e){}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
-<script>
+            resultDiv.textContent = result;
+        };
 
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBs7eQyMrcN8kJWMHl2ac2UZHlYQ6DypD8",
-    authDomain: "terminal-xxrr.firebaseapp.com",
-    databaseURL: "https://terminal-xxrr-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "terminal-xxrr",
-    storageBucket: "terminal-xxrr.firebasestorage.app",
-    messagingSenderId: "722753278120",
-    appId: "1:722753278120:web:bfa37aab39635a4e57f29d",
-    measurementId: "G-E3MZH3E1K5"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  // Expose helpers to window for non-module scripts
-  window.__db = db;
-  window.__ref = (path)=>ref(db, path);
-  window.__onValue = onValue;
-  window.__set = set;
-  window.__update = update;
-  window.__get = get;
-</script>
-<script>
-function showSuccessPopup(file, isPrediction){
-  const el = document.getElementById('successPopup');
-  if(!el) return;
-  el.style.display = 'flex';
-  setTimeout(()=>{ 
-    el.style.display='none'; 
-    if(isPrediction || file === 'prediction.html'){
-      alert('✅ Payment verified — Opening Prediction page...');
-      window.location.href = 'prediction.html';
-    } else if(file){
-      const msg = document.createElement('div');
-      msg.innerText = '✅ Download starting...';
-      msg.style.position='fixed';
-      msg.style.top='50%';
-      msg.style.left='50%';
-      msg.style.transform='translate(-50%,-50%)';
-      msg.style.background='#fff';
-      msg.style.color='#0b1724';
-      msg.style.padding='14px 20px';
-      msg.style.borderRadius='8px';
-      msg.style.boxShadow='0 4px 20px rgba(0,0,0,.2)';
-      document.body.appendChild(msg);
-      setTimeout(()=>{ msg.remove(); window.location.href = file; },2000);
-    }
-  }, 2000);
-}
-</script></body>
+    </script>
+</body>
 </html>
