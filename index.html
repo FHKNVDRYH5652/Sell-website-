@@ -61,6 +61,8 @@
         /* Activate Hack Button Styling (Center Bottom) */
         #activate-hack-button {
             position: fixed; 
+            left: 50%; /* Center Horizontally */
+            transform: translateX(-50%); /* Adjust to true center */
             bottom: 20px;    
             padding: 15px 30px;
             background-color: #ff0000; /* Bright Red */
@@ -82,11 +84,11 @@
 
         @keyframes pulse {
             from {
-                transform: scale(1);
+                transform: scale(1) translateX(-50%);
                 box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             }
             to {
-                transform: scale(1.05);
+                transform: scale(1.05) translateX(-50%);
                 box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.7);
             }
         }
@@ -421,83 +423,88 @@
         const CORRECT_PASSWORD = 'Mickey456';
         const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9';
         
-        // --- FUNCTION TO UNMUTE VIDEOS AFTER USER INTERACTION ---
-        const unmuteAllVideos = () => {
-            // Unmute and play the first video (if it hasn't ended)
-            if (!introVideo.ended && introVideo.muted) {
-                 introVideo.muted = false;
-                 introVideo.play().catch(e => console.log("Intro video unmuting/playback failed after click:", e));
-            }
-            
-            // Unmute and play the second video (only if login page is visible)
-            if (mainLoginPage.style.display === 'block' && eyeVideo.muted) {
-                eyeVideo.muted = false;
-                eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after click:", e));
-            }
-        };
+        // Track if the user has interacted to activate the sound
+        let audioActivated = false; 
 
+        // --- CORE FUNCTION TO SHOW NEXT PAGE (after video ends or is skipped) ---
         const showLoginPage = () => {
             // Hide intro elements
             videoSplash.style.display = 'none';
             activateHackButton.style.display = 'none';
-            skipButton.style.display = 'none'; // Hide skip button too
+            skipButton.style.display = 'none'; 
 
             // Show login page
             document.body.style.backgroundColor = 'white';
             mainLoginPage.style.display = 'block';
             
-            // Start the second video (Muted, will be unmuted by click action)
-            eyeVideo.play().catch(e => console.log("Eye video initial playback failed:", e));
+            // Start the second video. If audio was activated, it will play with sound.
+            if (audioActivated) {
+                eyeVideo.muted = false; // Unmute second video
+            }
+            eyeVideo.play().catch(e => console.log("Eye video playback failed:", e));
 
             // Show the pop-up
             channelPopup.style.display = 'flex';
         };
 
-        // 1. Activate Hack Button Click (Main way to activate sound and continue)
+        // --- BUTTON ACTIONS ---
+
+        // 1. Activate Hack Button Click (Starts video with audio)
         activateHackButton.onclick = () => {
-             // 1. Unmute both videos immediately
-             unmuteAllVideos();
-             
-             // 2. Hide the button and show the login page
-             showLoginPage(); 
+             // 1. Unmute the current video (pain.mp4)
+             if (introVideo.muted) {
+                 introVideo.muted = false;
+                 audioActivated = true; // Mark audio as activated
+                 introVideo.play().catch(e => console.log("Intro video unmuting/playback failed:", e));
+             }
+
+             // 2. Hide buttons while video is playing
+             activateHackButton.style.display = 'none';
+             skipButton.style.display = 'none'; 
+
+             // 3. IMPORTANT: Do NOT call showLoginPage. Wait for the video to end.
         };
         
-        // 2. Skip Video Button Click (Skips video, also acts as user interaction to activate sound)
+        // 2. Skip Video Button Click (Skips video and goes to next page with audio)
         skipButton.onclick = () => {
-             // 1. Unmute both videos immediately
-             unmuteAllVideos();
-             
-             // 2. Skip to the next page
-             showLoginPage(); 
+             audioActivated = true; // User interacted, activate audio
+             showLoginPage(); // Skip to the next page immediately
         };
 
         
-        // When video ends (NO USER CLICK, so sound remains muted)
+        // --- VIDEO ENDED EVENT ---
+
+        // When video ends, automatically proceed to the next page
         introVideo.onended = () => {
-             // If the video ends without a click, we only proceed to the login page (muted)
              showLoginPage();
-             activateHackButton.style.display = 'none'; // Ensure hack button is hidden
-             skipButton.style.display = 'none'; // Ensure skip button is hidden
-             // Sound will only activate if the user clicks JOIN or CANCEL on the pop-up
         };
 
         
-        // --- 2. Pop-up Logic (Click here also activates sound, if not done before) ---
+        // --- POP-UP LOGIC (Any click here also ensures audio is activated) ---
 
-        // Join button redirects to Telegram link (User Interaction - Guarantees sound)
+        const handlePopupClick = () => {
+            if (!audioActivated) {
+                // This is a backup to ensure eyeVideo gets unmuted if user closes the pop-up
+                audioActivated = true;
+                eyeVideo.muted = false;
+                eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after pop-up click:", e));
+            }
+            channelPopup.style.display = 'none';
+        };
+
+
+        // Join button redirects to Telegram link
         joinChannelBtn.onclick = () => {
             window.open(TELEGRAM_LINK_MAIN, '_blank');
-            channelPopup.style.display = 'none';
-            unmuteAllVideos(); // Unmute after click
+            handlePopupClick(); 
         };
 
-        // Cancel button closes the pop-up (User Interaction - Guarantees sound)
+        // Cancel button closes the pop-up
         cancelPopupBtn.onclick = () => {
-            channelPopup.style.display = 'none';
-            unmuteAllVideos(); // Unmute after click
+            handlePopupClick();
         };
 
-        // --- 3. Login Logic ---
+        // --- LOGIN/TOOL LOGIC ---
 
         loginForm.onsubmit = (e) => {
             e.preventDefault();
@@ -511,8 +518,6 @@
                 passwordInput.value = '';
             }
         };
-
-        // --- 4. Tool/Result Generation Logic ---
 
         generateBtn.onclick = () => {
             const periodNumber = document.getElementById('period-number').value;
@@ -532,7 +537,12 @@
         // --- Initial Autoplay Attempt (Muted) ---
         // Play the first video immediately, but MUTED, to adhere to browser policies.
         introVideo.play().catch(e => console.log("Initial muted autoplay blocked:", e));
-
+        
+        // Show buttons once the video is ready to play
+        introVideo.onloadeddata = () => {
+            activateHackButton.style.display = 'block';
+            skipButton.style.display = 'block';
+        };
 
     </script>
 </body>
