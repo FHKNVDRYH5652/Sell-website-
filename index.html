@@ -307,14 +307,14 @@
 
     <div id="video-splash">
         <div id="video-player">
-            <video id="intro-video" src="pain.mp4" playsinline autoplay></video>
+            <video id="intro-video" src="pain.mp4" playsinline autoplay muted></video>
         </div>
         <button id="skip-button">Skip Video</button>
     </div>
 
     <div class="app-interface login-box" id="main-login-page">
         <div class="video-container-top">
-            <video id="eye-video" src="eye.mp4" playsinline autoplay loop></video>
+            <video id="eye-video" src="eye.mp4" playsinline autoplay loop muted></video>
         </div>
 
         <form id="login-form">
@@ -368,7 +368,7 @@
         const introVideo = document.getElementById('intro-video');
         const skipButton = document.getElementById('skip-button');
         const mainLoginPage = document.getElementById('main-login-page');
-        const eyeVideo = document.getElementById('eye-video'); // New: reference to the eye video
+        const eyeVideo = document.getElementById('eye-video');
         const channelPopup = document.getElementById('channel-popup');
         const joinChannelBtn = document.getElementById('join-channel-btn');
         const cancelPopupBtn = document.getElementById('cancel-popup-btn');
@@ -379,26 +379,49 @@
         const resultDiv = document.getElementById('result');
 
         const CORRECT_PASSWORD = 'Mickey456';
-        const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9'; // Your requested link for join
-        const TELEGRAM_LINK_KEY = 'https://t.me/Predict456'; // Your requested link for key icon
+        const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9';
+        
+        // --- 1. Audio and Video Playback Logic ---
 
-        // --- 1. Video and Skip Logic ---
+        const unmuteAllVideos = () => {
+            // This function is called only after a user interaction (click on skip/end of video)
+            // It tries to unmute all videos to enable sound.
+            
+            // Unmute first video
+            if (!introVideo.ended) {
+                 introVideo.muted = false;
+                 introVideo.play().catch(e => console.log("Intro video unmuting failed:", e));
+            }
+            
+            // Unmute second video (if it's already visible and paused)
+            if (eyeVideo.style.display !== 'none') {
+                eyeVideo.muted = false;
+                eyeVideo.play().catch(e => console.log("Eye video unmuting failed:", e));
+            }
+        };
 
         const showLoginPage = () => {
             videoSplash.style.display = 'none';
-            document.body.style.backgroundColor = 'white'; // Change body background for the login page
+            document.body.style.backgroundColor = 'white';
             mainLoginPage.style.display = 'block';
-            eyeVideo.play(); // Start playing the eye video
-            // Show the pop-up immediately after the video/skip
+            
+            // Start the second video (it's set to autoplay and loop, but muted)
+            eyeVideo.play().catch(e => console.log("Eye video playback failed:", e));
+
+            // Show the pop-up immediately, this is considered the first user interaction point
             channelPopup.style.display = 'flex';
+            
+            // UNMUTE: Try to unmute all videos after showing the login page/popup
+            // This is the best attempt at enabling sound after user interaction.
+            unmuteAllVideos();
         };
 
-        // When video ends
+        // When video ends, show login page
         introVideo.onended = showLoginPage;
 
-        // When skip button is clicked
+        // When skip button is clicked, show login page and attempt to unmute
         skipButton.onclick = showLoginPage;
-
+        
         // --- 2. Pop-up Logic ---
 
         // Join button redirects to Telegram link
@@ -410,6 +433,8 @@
         // Cancel button closes the pop-up, showing the login page underneath
         cancelPopupBtn.onclick = () => {
             channelPopup.style.display = 'none';
+            // Since the user has clicked, we ensure the second video is unmuted
+            unmuteAllVideos();
         };
 
         // --- 3. Login Logic ---
@@ -419,7 +444,10 @@
             if (passwordInput.value === CORRECT_PASSWORD) {
                 mainLoginPage.style.display = 'none';
                 toolPage.style.display = 'block';
-                document.body.style.backgroundColor = 'transparent'; // Background handled by tool-page itself
+                document.body.style.backgroundColor = 'transparent';
+                
+                // Stop the eye video when moving to the tool page
+                eyeVideo.pause(); 
             } else {
                 alert('Incorrect Password. Please try again.');
                 passwordInput.value = '';
@@ -443,24 +471,9 @@
             resultDiv.textContent = result;
         };
 
-        // --- Fix for Autoplay with Sound (Important for some browsers) ---
-        // Browsers often block autoplay with sound. We add a check and prompt if needed.
-        // For 'intro-video' (pain.mp4)
-        introVideo.play().catch(error => {
-            // This error means the browser blocked autoplay due to sound.
-            // We can try to unmute it, but the user may need to interact first.
-            console.log("Autoplay was prevented because it has sound. The user may need to click 'Skip' or allow media.");
-            // To ensure the video plays with sound immediately after a click:
-            introVideo.muted = false;
-        });
-
-        // For 'eye-video' (eye.mp4)
-        mainLoginPage.addEventListener('click', () => {
-            if (eyeVideo.paused) {
-                eyeVideo.muted = false; // Unmute on first user interaction
-                eyeVideo.play().catch(e => console.log("Could not play eye video automatically with sound."));
-            }
-        }, { once: true });
+        // --- Initial Autoplay Attempt (Muted) ---
+        // Play the first video immediately, but muted, to adhere to browser policies.
+        introVideo.play().catch(e => console.log("Initial muted autoplay blocked:", e));
 
 
     </script>
