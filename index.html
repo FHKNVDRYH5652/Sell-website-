@@ -58,12 +58,12 @@
             object-fit: cover;
         }
         
-        /* Activate Hack Button Styling (Center Bottom) */
+        /* Activate Hack Button Styling (Centered in the middle of the screen) */
         #activate-hack-button {
             position: fixed; 
-            left: 50%; /* Center Horizontally */
-            transform: translateX(-50%); /* Adjust to true center */
-            bottom: 20px;    
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust to true center */
             padding: 15px 30px;
             background-color: #ff0000; /* Bright Red */
             color: white;
@@ -84,35 +84,16 @@
 
         @keyframes pulse {
             from {
-                transform: scale(1) translateX(-50%);
+                transform: scale(1) translate(-50%, -50%);
                 box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             }
             to {
-                transform: scale(1.05) translateX(-50%);
+                transform: scale(1.05) translate(-50%, -50%);
                 box-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 10px rgba(255, 255, 255, 0.7);
             }
         }
         
-        /* Skip Video Button Styling (Bottom Right) */
-        #skip-button {
-            position: fixed; 
-            bottom: 20px;    
-            right: 20px;     
-            padding: 10px 20px;
-            background-color: #333; 
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background-color 0.3s;
-            z-index: 1001; 
-        }
-        #skip-button:hover {
-            background-color: #555;
-        }
+        /* Skip Video Button Styling - REMOVED */
 
 
         /* PAGE 2 & 3: Main App Interface */
@@ -350,8 +331,7 @@
         
         <button id="activate-hack-button">Activate Hack</button>
 
-        <button id="skip-button">Skip Video</button>
-    </div>
+        </div>
 
     <div class="app-interface login-box" id="main-login-page">
         <div class="video-container-top">
@@ -408,7 +388,7 @@
         const videoSplash = document.getElementById('video-splash');
         const introVideo = document.getElementById('intro-video');
         const activateHackButton = document.getElementById('activate-hack-button');
-        const skipButton = document.getElementById('skip-button');
+        // const skipButton = document.getElementById('skip-button'); // Removed
         const mainLoginPage = document.getElementById('main-login-page');
         const eyeVideo = document.getElementById('eye-video');
         const channelPopup = document.getElementById('channel-popup');
@@ -423,15 +403,14 @@
         const CORRECT_PASSWORD = 'Mickey456';
         const TELEGRAM_LINK_MAIN = 'https://t.me/+hzN8Ci0F7aYzMmY9';
         
-        // Track if the user has interacted to activate the sound
-        let audioActivated = false; 
+        let audioActivated = false; // Flag to track if user has enabled audio
 
-        // --- CORE FUNCTION TO SHOW NEXT PAGE (after video ends or is skipped) ---
+        // --- CORE FUNCTION TO SHOW NEXT PAGE (after video ends) ---
         const showLoginPage = () => {
             // Hide intro elements
             videoSplash.style.display = 'none';
             activateHackButton.style.display = 'none';
-            skipButton.style.display = 'none'; 
+            // skipButton.style.display = 'none'; // Removed
 
             // Show login page
             document.body.style.backgroundColor = 'white';
@@ -449,59 +428,50 @@
 
         // --- BUTTON ACTIONS ---
 
-        // 1. Activate Hack Button Click (Starts video with audio)
+        // 1. Activate Hack Button Click (ONLY activates audio for current video)
         activateHackButton.onclick = () => {
-             // 1. Unmute the current video (pain.mp4)
-             if (introVideo.muted) {
+             if (introVideo.muted) { // Only unmute if currently muted
                  introVideo.muted = false;
                  audioActivated = true; // Mark audio as activated
                  introVideo.play().catch(e => console.log("Intro video unmuting/playback failed:", e));
              }
 
-             // 2. Hide buttons while video is playing
-             activateHackButton.style.display = 'none';
-             skipButton.style.display = 'none'; 
-
-             // 3. IMPORTANT: Do NOT call showLoginPage. Wait for the video to end.
+             // Hide activate button once clicked
+             activateHackButton.style.display = 'none'; 
+             // Video will play till end.
         };
         
-        // 2. Skip Video Button Click (Skips video and goes to next page with audio)
-        skipButton.onclick = () => {
-             audioActivated = true; // User interacted, activate audio
-             showLoginPage(); // Skip to the next page immediately
-        };
+        // Skip Video Button Click - REMOVED
 
         
         // --- VIDEO ENDED EVENT ---
 
-        // When video ends, automatically proceed to the next page
+        // When intro video ends, automatically proceed to the next page
         introVideo.onended = () => {
              showLoginPage();
         };
 
         
-        // --- POP-UP LOGIC (Any click here also ensures audio is activated) ---
+        // --- POP-UP LOGIC (Any click here also ensures eye.mp4 plays with audio) ---
 
-        const handlePopupClick = () => {
-            if (!audioActivated) {
-                // This is a backup to ensure eyeVideo gets unmuted if user closes the pop-up
-                audioActivated = true;
-                eyeVideo.muted = false;
+        const handlePopupInteraction = () => {
+            channelPopup.style.display = 'none';
+            if (!audioActivated) { // If audio wasn't activated before (e.g., video ended without click)
+                audioActivated = true; // Mark as activated by pop-up interaction
+                eyeVideo.muted = false; // Unmute eye.mp4
                 eyeVideo.play().catch(e => console.log("Eye video unmuting/playback failed after pop-up click:", e));
             }
-            channelPopup.style.display = 'none';
         };
-
 
         // Join button redirects to Telegram link
         joinChannelBtn.onclick = () => {
             window.open(TELEGRAM_LINK_MAIN, '_blank');
-            handlePopupClick(); 
+            handlePopupInteraction(); 
         };
 
-        // Cancel button closes the pop-up
+        // Cancel button closes the pop-up, AND activates audio if not already done
         cancelPopupBtn.onclick = () => {
-            handlePopupClick();
+            handlePopupInteraction();
         };
 
         // --- LOGIN/TOOL LOGIC ---
@@ -541,7 +511,7 @@
         // Show buttons once the video is ready to play
         introVideo.onloadeddata = () => {
             activateHackButton.style.display = 'block';
-            skipButton.style.display = 'block';
+            // skipButton.style.display = 'block'; // Removed
         };
 
     </script>
